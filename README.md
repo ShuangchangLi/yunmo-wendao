@@ -4,7 +4,7 @@
 
 ## Play
 
-After GitHub Pages is enabled, the live build will be available from the repository Pages URL.
+Play in browser: https://shuangchangli.github.io/yunmo-wendao/
 
 ## Run
 
