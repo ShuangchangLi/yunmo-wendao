@@ -24,6 +24,24 @@ The main scene is:
 res://scenes/main.tscn
 ```
 
+On this machine, Godot is configured at:
+
+```text
+C:\godot\godot.exe
+```
+
+You can open the project with:
+
+```powershell
+.\run-godot.ps1
+```
+
+Headless validation:
+
+```powershell
+C:\godot\godot.exe --headless --path D:\dev\testGame1\godot --quit
+```
+
 ## Structure
 
 - `data/`: data-driven cards, classes, enemies, keywords
