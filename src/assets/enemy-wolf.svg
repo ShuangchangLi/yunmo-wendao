@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 260" role="img" aria-label="grey wolf ink painting">
+  <defs>
+    <linearGradient id="wolfInk" x1="0" x2="1">
+      <stop offset="0" stop-color="#171815"/>
+      <stop offset="0.7" stop-color="#4a4a42"/>
+      <stop offset="1" stop-color="#11120f"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="260" fill="#eadcc1"/>
+  <path d="M45 205 C92 154 128 108 196 112 C253 115 301 148 326 198 C256 189 199 190 145 210 C103 225 73 224 45 205Z" fill="url(#wolfInk)" opacity="0.92"/>
+  <path d="M118 128 L91 58 L157 105Z" fill="#20211f"/>
+  <path d="M154 111 L204 44 L202 128Z" fill="#24251f"/>
+  <path d="M190 126 C230 105 270 108 304 132 C276 139 249 151 220 170Z" fill="#191a16"/>
+  <path d="M248 139 L309 100 L286 164Z" fill="#191a16"/>
+  <path d="M174 142 C188 135 208 135 218 146" fill="none" stroke="#eadcc1" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
+  <circle cx="222" cy="126" r="6" fill="#c34b3b"/>
+  <path d="M226 161 C253 165 275 170 300 183" stroke="#eadcc1" stroke-width="5" stroke-linecap="round" opacity="0.32"/>
+  <path d="M78 211 C72 227 68 239 61 252M142 211 C139 232 139 244 134 258M236 196 C235 221 232 238 225 258" stroke="#171815" stroke-width="13" stroke-linecap="round"/>
+  <path d="M32 214 C93 225 151 231 236 219" stroke="#6d604f" stroke-width="5" stroke-linecap="round" opacity="0.4"/>
+</svg>

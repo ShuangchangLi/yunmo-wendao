@@ -27,6 +27,13 @@ body {
     #151512;
 }
 
+body:has(.start-v2) {
+  background:
+    linear-gradient(rgba(12, 13, 11, 0.3), rgba(12, 13, 11, 0.62)),
+    url("./assets/ink-mountain.svg") center / cover fixed,
+    #151512;
+}
+
 button {
   color: inherit;
   font: inherit;
@@ -42,6 +49,81 @@ button {
   min-height: 100vh;
   margin: 0 auto;
   padding: 24px 0;
+}
+
+.start-v2 {
+  width: min(1180px, calc(100vw - 32px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 22px 0 26px;
+  display: grid;
+  grid-template-rows: minmax(360px, 58vh) auto;
+  gap: 16px;
+}
+
+.start-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(238, 226, 205, 0.42);
+  border-radius: 8px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.36);
+  background: #1b1b17;
+}
+
+.start-hero img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.94) contrast(1.05);
+}
+
+.start-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(14, 14, 12, 0.82), rgba(14, 14, 12, 0.18) 58%, rgba(14, 14, 12, 0.42)),
+    linear-gradient(0deg, rgba(14, 14, 12, 0.58), transparent 42%);
+}
+
+.start-copy {
+  position: relative;
+  z-index: 1;
+  width: min(600px, 92%);
+  height: 100%;
+  padding: clamp(28px, 6vw, 64px);
+  display: grid;
+  align-content: center;
+  color: #f4ead6;
+}
+
+.start-copy .seal {
+  color: #f4d28e;
+  border-color: rgba(244, 210, 142, 0.56);
+}
+
+.start-copy h1 {
+  font-size: clamp(58px, 10vw, 118px);
+  letter-spacing: 0.08em;
+  text-shadow: 0 18px 50px rgba(0, 0, 0, 0.46);
+}
+
+.start-copy .subtitle {
+  color: rgba(244, 234, 214, 0.82);
+}
+
+.ghost.light {
+  width: max-content;
+  margin-top: 22px;
+  color: #f9edcf;
+  border-color: rgba(244, 210, 142, 0.42);
+  background: rgba(25, 25, 21, 0.36);
+}
+
+.cultivator-grid.compact {
+  grid-column: auto;
 }
 
 .start-shell {
@@ -220,6 +302,10 @@ h1 {
   gap: 14px;
 }
 
+.combat-layout.v2 {
+  grid-template-rows: auto minmax(320px, 1fr) auto;
+}
+
 .topbar {
   min-height: 82px;
   display: flex;
@@ -325,6 +411,27 @@ h1 {
   gap: 14px;
 }
 
+.battlefield.v2 {
+  grid-template-columns: minmax(260px, 1fr) 70px minmax(260px, 1fr);
+  align-items: stretch;
+  min-height: 390px;
+}
+
+.clash-mark {
+  align-self: center;
+  justify-self: center;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(238, 226, 205, 0.4);
+  border-radius: 50%;
+  color: #f4ead6;
+  background: rgba(25, 25, 21, 0.56);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+  font-weight: 900;
+}
+
 .combatant {
   position: relative;
   overflow: hidden;
@@ -332,6 +439,38 @@ h1 {
   display: grid;
   align-content: end;
   gap: 12px;
+}
+
+.combatant.v2 {
+  align-content: stretch;
+  grid-template-rows: 1fr auto auto auto;
+  min-height: 390px;
+}
+
+.unit-top {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(150px, 1.1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.enemy .unit-top {
+  grid-template-columns: minmax(170px, 1.1fr) minmax(150px, 1fr);
+}
+
+.portrait-frame {
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+}
+
+.enemy-art {
+  width: min(100%, 300px);
+  max-height: 230px;
+  border: 1px solid rgba(31, 29, 24, 0.16);
+  border-radius: 8px;
+  object-fit: contain;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .ink-figure {
@@ -361,11 +500,11 @@ h1 {
 }
 
 .intent-card {
-  position: absolute;
-  top: 16px;
-  right: 18px;
+  position: relative;
+  top: auto;
+  right: auto;
   z-index: 1;
-  width: 168px;
+  width: 100%;
   min-height: 88px;
   padding: 12px 12px 10px 54px;
   border: 2px solid rgba(184, 71, 54, 0.5);
@@ -374,6 +513,43 @@ h1 {
   font-weight: 900;
   background: rgba(242, 232, 212, 0.82);
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+}
+
+.focus-card {
+  width: 100%;
+  min-height: 88px;
+  padding: 12px 12px 10px 54px;
+  border: 2px solid rgba(88, 120, 106, 0.42);
+  border-radius: 8px;
+  color: var(--jade);
+  font-weight: 900;
+  background: rgba(242, 232, 212, 0.72);
+}
+
+.focus-card span {
+  position: absolute;
+}
+
+.focus-card {
+  position: relative;
+}
+
+.focus-card span {
+  left: 12px;
+  top: 17px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff4dc;
+  background: var(--jade);
+}
+
+.focus-card p {
+  margin-top: 4px;
+  color: rgba(31, 29, 24, 0.74);
+  font-size: 13px;
 }
 
 .intent-card span {
@@ -702,16 +878,56 @@ h1 {
   background: rgba(255, 249, 232, 0.4);
 }
 
-.log {
-  min-height: 114px;
-  padding: 14px;
+.log-drawer {
+  position: fixed;
+  top: 116px;
+  right: 0;
+  z-index: 20;
+  width: 310px;
+  transform: translateX(266px);
+  transition: transform 180ms ease;
 }
 
-.log h2 {
-  margin-bottom: 8px;
+.log-drawer.open {
+  transform: translateX(0);
 }
 
-.log p {
+.log-tab {
+  position: absolute;
+  left: -48px;
+  top: 0;
+  width: 48px;
+  min-height: 78px;
+  border: 1px solid rgba(238, 226, 205, 0.48);
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  color: #f4ead6;
+  background: rgba(25, 25, 21, 0.82);
+  font-weight: 900;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+}
+
+.log-panel {
+  min-height: 260px;
+  max-height: min(520px, calc(100vh - 150px));
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid rgba(238, 226, 205, 0.48);
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  background: rgba(234, 220, 193, 0.94);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
+}
+
+.log-panel h2 {
+  margin-bottom: 10px;
+}
+
+.log-panel p {
+  padding: 8px 0;
+  border-top: 1px solid rgba(31, 29, 24, 0.1);
+  color: rgba(31, 29, 24, 0.76);
   line-height: 1.45;
 }
 
@@ -849,14 +1065,24 @@ h1 {
 
 @media (max-width: 860px) {
   .start-shell,
+  .start-v2,
   .combat-layout {
     width: min(100vw - 20px, 680px);
   }
 
   .start-shell,
   .battlefield,
+  .battlefield.v2,
   .hand-panel {
     grid-template-columns: 1fr;
+  }
+
+  .start-v2 {
+    grid-template-rows: auto auto;
+  }
+
+  .start-hero {
+    min-height: 420px;
   }
 
   .hero-art {
@@ -887,9 +1113,18 @@ h1 {
     min-height: 280px;
   }
 
-  .intent-card {
-    position: static;
-    width: 100%;
-    margin-bottom: 12px;
+  .unit-top,
+  .enemy .unit-top {
+    grid-template-columns: 1fr;
+  }
+
+  .clash-mark {
+    display: none;
+  }
+
+  .log-drawer {
+    top: 90px;
+    width: min(300px, calc(100vw - 52px));
+    transform: translateX(calc(100% - 44px));
   }
 }

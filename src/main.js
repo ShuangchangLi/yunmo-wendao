@@ -1,6 +1,7 @@
 import {
   CARD_LIBRARY,
   CULTIVATORS,
+  GAME_TITLE,
   KEYWORDS,
   addRewardCard,
   chooseCultivator,
@@ -14,6 +15,7 @@ import {
 } from "./game.js";
 
 let game = createGame();
+let logOpen = false;
 const app = document.querySelector("#app");
 
 function render() {
@@ -31,19 +33,17 @@ function renderScreen() {
 
 function renderStart() {
   return `
-    <section class="start-shell">
-      <div class="brand">
-        <p class="seal">墨 · 道 · 劫</p>
-        <h1>云墨问道</h1>
-        <p class="subtitle">以牌为招，以灵力为息。职业路线会从学徒走向正路、邪路或隐藏传承。</p>
-        <div class="start-actions">
-          <button class="ghost" data-action="open-codex">图鉴</button>
+    <section class="start-v2">
+      <div class="start-hero">
+        <img src="./src/assets/ink-mountain.svg" alt="" />
+        <div class="start-copy">
+          <p class="seal">山 · 海 · 劫</p>
+          <h1>${GAME_TITLE}</h1>
+          <p class="subtitle">一卷水墨山海，一场入世问道。选择出身，以牌为招，先从山脚三战试剑。</p>
+          <button class="ghost light" data-action="open-codex">查看图鉴</button>
         </div>
       </div>
-      <div class="hero-art" aria-hidden="true">
-        <img src="./src/assets/ink-mountain.svg" alt="" />
-      </div>
-      <section class="cultivator-grid" aria-label="选择角色">
+      <section class="cultivator-grid compact" aria-label="选择角色">
         ${Object.values(CULTIVATORS).map(renderCultivator).join("")}
       </section>
     </section>
@@ -65,21 +65,23 @@ function renderCultivator(cultivator) {
 
 function renderCombat() {
   return `
-    <section class="combat-layout">
+    <section class="combat-layout v2">
       <header class="topbar">
         <div>
-          <p class="eyebrow">第 ${game.floor} 重天</p>
+          <p class="eyebrow">第 ${game.floor} 战</p>
           <h1>${game.player.name}</h1>
         </div>
         <div class="combat-resources">
           ${energyOrbs(game.player.energy, game.player.maxEnergy)}
           ${classMeter(game.player.resourceName, game.player.qi, game.player.maxQi, game.player.transcendent)}
           <button class="icon-button" data-action="open-codex" title="图鉴">鉴</button>
+          <button class="icon-button" data-action="toggle-log" title="战史">史</button>
         </div>
       </header>
 
-      <section class="battlefield">
+      <section class="battlefield v2">
         ${renderCombatant("player")}
+        <div class="clash-mark">对</div>
         ${renderCombatant("enemy")}
       </section>
 
@@ -95,10 +97,7 @@ function renderCombat() {
         <button class="end-turn" data-action="end-turn">收势</button>
       </section>
 
-      <aside class="log panel">
-        <h2>战局</h2>
-        ${game.log.map((entry) => `<p>${entry}</p>`).join("")}
-      </aside>
+      ${renderLogDrawer()}
     </section>
   `;
 }
@@ -109,9 +108,13 @@ function renderCombatant(side) {
   const hpMax = unit.maxHp;
   const hp = unit.hp;
   return `
-    <article class="combatant ${side}">
-      ${isEnemy ? enemyIntent() : ""}
-      <div class="ink-figure">${isEnemy ? "妖" : "人"}</div>
+    <article class="combatant ${side} v2">
+      <div class="unit-top">
+        ${isEnemy ? enemyIntent() : playerFocus()}
+        <div class="portrait-frame">
+          ${isEnemy ? `<img class="enemy-art" src="${unit.art}" alt="${unit.name}" />` : `<div class="ink-figure">人</div>`}
+        </div>
+      </div>
       <div class="combatant-title">
         <p class="eyebrow">${isEnemy ? unit.title : unit.school}</p>
         <h2>${unit.name}</h2>
@@ -127,10 +130,20 @@ function renderCombatant(side) {
         </div>
       </div>
       <div class="status-row">
-        ${isEnemy ? statusBadge("煞气", unit.strength) + statusBadge("异火", unit.burn) : statusBadge(unit.resourceName, unit.qi) + statusBadge("力道", unit.strength)}
+        ${isEnemy ? statusBadge("攻势", unit.strength) + statusBadge("异火", unit.burn) : statusBadge(unit.resourceName, unit.qi) + statusBadge("力道", unit.strength)}
         ${!isEnemy && unit.transcendent ? statusBadge("通玄", "已成") : ""}
       </div>
     </article>
+  `;
+}
+
+function playerFocus() {
+  return `
+    <div class="focus-card">
+      <span>身</span>
+      <strong>整备</strong>
+      <p>观察敌意，择牌出招</p>
+    </div>
   `;
 }
 
@@ -145,6 +158,18 @@ function enemyIntent() {
       <strong>${move.label}</strong>
       <p>${label} ${amount} ${unit}</p>
     </div>
+  `;
+}
+
+function renderLogDrawer() {
+  return `
+    <aside class="log-drawer ${logOpen ? "open" : ""}">
+      <button class="log-tab" data-action="toggle-log">${logOpen ? "收起" : "战史"}</button>
+      <div class="log-panel">
+        <h2>战斗历史</h2>
+        ${game.log.map((entry) => `<p>${entry}</p>`).join("")}
+      </div>
+    </aside>
   `;
 }
 
@@ -278,7 +303,7 @@ function statusBadge(label, value) {
 function intentIcon(intent) {
   if (intent === "attack") return "杀";
   if (intent === "block") return "守";
-  return "煞";
+  return "势";
 }
 
 function bindEvents() {
@@ -293,6 +318,7 @@ function bindEvents() {
       if (action === "restart") game = restartGame();
       if (action === "open-codex") showCodex(game);
       if (action === "close-codex") closeCodex(game);
+      if (action === "toggle-log") logOpen = !logOpen;
       render();
     });
   });

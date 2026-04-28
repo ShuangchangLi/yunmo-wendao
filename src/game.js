@@ -1,3 +1,5 @@
+export const GAME_TITLE = "山海问道";
+
 export const KEYWORDS = {
   lingli: {
     name: "灵力",
@@ -222,33 +224,40 @@ export const CARD_LIBRARY = {
 
 const ENCOUNTERS = [
   {
-    name: "山魈",
-    title: "雾岭妖物",
-    maxHp: 38,
+    id: "wolf",
+    name: "灰背小狼",
+    title: "林间幼兽",
+    art: "./src/assets/enemy-wolf.svg",
+    maxHp: 30,
     moves: [
-      { intent: "attack", amount: 7, label: "裂爪" },
-      { intent: "block", amount: 7, label: "伏石" },
-      { intent: "attack", amount: 10, label: "扑杀" },
+      { intent: "attack", amount: 6, label: "撕咬" },
+      { intent: "attack", amount: 5, label: "连扑" },
+      { intent: "buff", amount: 2, label: "嗥叫" },
     ],
   },
   {
-    name: "黑莲散人",
-    title: "邪道修士",
-    maxHp: 48,
+    id: "boar",
+    name: "裂牙野猪",
+    title: "山道蛮兽",
+    art: "./src/assets/enemy-boar.svg",
+    maxHp: 44,
     moves: [
-      { intent: "attack", amount: 8, label: "毒掌" },
-      { intent: "buff", amount: 2, label: "炼煞" },
-      { intent: "attack", amount: 11, label: "黑莲印" },
+      { intent: "block", amount: 8, label: "拱地" },
+      { intent: "attack", amount: 13, label: "冲撞" },
+      { intent: "attack", amount: 8, label: "獠牙" },
     ],
   },
   {
-    name: "铜甲尸",
-    title: "古墓守卫",
-    maxHp: 60,
+    id: "bandit",
+    name: "黑巾强盗",
+    title: "劫道刀客",
+    art: "./src/assets/enemy-bandit.svg",
+    maxHp: 52,
     moves: [
-      { intent: "attack", amount: 11, label: "尸臂横扫" },
-      { intent: "block", amount: 12, label: "铜皮" },
-      { intent: "attack", amount: 15, label: "破门撞" },
+      { intent: "attack", amount: 8, label: "劈砍" },
+      { intent: "block", amount: 7, label: "架刀" },
+      { intent: "buff", amount: 3, label: "叫阵" },
+      { intent: "attack", amount: 12, label: "横斩" },
     ],
   },
 ];
@@ -263,7 +272,7 @@ export function createGame() {
     player: null,
     enemy: null,
     turn: 0,
-    log: ["墨雨初歇，山门将开。"],
+    log: ["山门外风声渐起。"],
     rngSeed: Date.now() % 2147483647,
   };
 }
@@ -306,14 +315,12 @@ export function chooseCultivator(game, cultivatorId) {
 export function startCombat(game) {
   const encounter = ENCOUNTERS[(game.floor - 1) % ENCOUNTERS.length];
   game.enemy = {
-    name: encounter.name,
-    title: encounter.title,
-    maxHp: encounter.maxHp + Math.floor((game.floor - 1) * 9),
-    hp: encounter.maxHp + Math.floor((game.floor - 1) * 9),
+    ...encounter,
+    maxHp: encounter.maxHp + Math.floor((game.floor - 1) * 6),
+    hp: encounter.maxHp + Math.floor((game.floor - 1) * 6),
     block: 0,
     strength: Math.floor((game.floor - 1) / 2),
     burn: 0,
-    moves: encounter.moves,
     moveIndex: 0,
     nextMove: null,
   };
@@ -327,7 +334,7 @@ export function startCombat(game) {
   game.screen = "combat";
   chooseEnemyMove(game);
   startPlayerTurn(game);
-  log(game, `第 ${game.floor} 重天：${game.enemy.name} 拦路。`);
+  log(game, `第 ${game.floor} 战：${game.enemy.name} 拦路。`);
 }
 
 export function playCard(game, handIndex) {
@@ -401,7 +408,7 @@ function resolveEnemyTurn(game) {
   }
   if (move.intent === "buff") {
     enemy.strength += move.amount;
-    log(game, `${enemy.name} 煞气上涌，攻势 +${move.amount}。`);
+    log(game, `${enemy.name} 攻势上涨 +${move.amount}。`);
   }
 }
 
@@ -509,5 +516,5 @@ function random(game) {
 
 function log(game, message) {
   game.log.unshift(message);
-  game.log = game.log.slice(0, 6);
+  game.log = game.log.slice(0, 8);
 }
