@@ -14,6 +14,8 @@ import {
   skipReward,
 } from "./game.js";
 
+const SAVE_KEY = "shan-hai-wen-dao-save";
+
 let game = createGame();
 let logOpen = false;
 const app = document.querySelector("#app");
@@ -28,10 +30,12 @@ function renderScreen() {
   if (game.screen === "start") return renderStart();
   if (game.screen === "defeat") return renderDefeat();
   if (game.screen === "reward") return renderReward();
+  if (game.screen === "complete") return renderComplete();
   return renderCombat();
 }
 
 function renderStart() {
+  const hasSave = Boolean(loadGame());
   return `
     <section class="start-v2">
       <div class="start-hero">
@@ -39,8 +43,12 @@ function renderStart() {
         <div class="start-copy">
           <p class="seal">山 · 海 · 劫</p>
           <h1>${GAME_TITLE}</h1>
-          <p class="subtitle">一卷水墨山海，一场入世问道。选择出身，以牌为招，先从山脚三战试剑。</p>
-          <button class="ghost light" data-action="open-codex">查看图鉴</button>
+          <p class="subtitle">一卷水墨山海，一场入世问道。先完成山脚三战：小狼、野猪、强盗。</p>
+          <div class="start-menu">
+            <button class="primary" data-action="new-run">新的试炼</button>
+            <button class="ghost light" data-action="continue" ${hasSave ? "" : "disabled"}>继续游戏</button>
+            <button class="ghost light" data-action="open-codex">查看图鉴</button>
+          </div>
         </div>
       </div>
       <section class="cultivator-grid compact" aria-label="选择角色">
@@ -68,12 +76,13 @@ function renderCombat() {
     <section class="combat-layout v2">
       <header class="topbar">
         <div>
-          <p class="eyebrow">第 ${game.floor} 战</p>
+          <p class="eyebrow">第 ${game.floor} 战 / 山脚试炼</p>
           <h1>${game.player.name}</h1>
         </div>
         <div class="combat-resources">
           ${energyOrbs(game.player.energy, game.player.maxEnergy)}
           ${classMeter(game.player.resourceName, game.player.qi, game.player.maxQi, game.player.transcendent)}
+          <button class="icon-button" data-action="exit-title" title="返回主界面">退</button>
           <button class="icon-button" data-action="open-codex" title="图鉴">鉴</button>
           <button class="icon-button" data-action="toggle-log" title="战史">史</button>
         </div>
@@ -109,8 +118,8 @@ function renderCombatant(side) {
   const hp = unit.hp;
   return `
     <article class="combatant ${side} v2">
-      <div class="unit-top">
-        ${isEnemy ? enemyIntent() : playerFocus()}
+      <div class="unit-top ${isEnemy ? "" : "player-top"}">
+        ${isEnemy ? enemyIntent() : ""}
         <div class="portrait-frame">
           ${isEnemy ? `<img class="enemy-art" src="${unit.art}" alt="${unit.name}" />` : `<div class="ink-figure">人</div>`}
         </div>
@@ -134,16 +143,6 @@ function renderCombatant(side) {
         ${!isEnemy && unit.transcendent ? statusBadge("通玄", "已成") : ""}
       </div>
     </article>
-  `;
-}
-
-function playerFocus() {
-  return `
-    <div class="focus-card">
-      <span>身</span>
-      <strong>整备</strong>
-      <p>观察敌意，择牌出招</p>
-    </div>
   `;
 }
 
@@ -182,6 +181,19 @@ function renderReward() {
         ${game.rewardChoices.map((cardId) => cardButton(cardId, "reward")).join("")}
       </div>
       <button class="ghost" data-action="skip-reward">不取机缘</button>
+      <button class="ghost" data-action="exit-title">返回主界面</button>
+    </section>
+  `;
+}
+
+function renderComplete() {
+  return `
+    <section class="panel end-state">
+      <p class="seal">试炼完成</p>
+      <h1>山脚已清</h1>
+      <p>你击退了小狼、野猪与强盗。第一段短程目标完成，下一步可以进入山门事件、路线选择或职业升级。</p>
+      <button class="primary" data-action="new-run">再来一轮</button>
+      <button class="ghost" data-action="exit-title">返回主界面</button>
     </section>
   `;
 }
@@ -192,7 +204,8 @@ function renderDefeat() {
       <p class="seal">道阻</p>
       <h1>此劫未渡</h1>
       <p>气海崩散，但残卷仍在。下一次入山，招式会更清晰。</p>
-      <button class="primary" data-action="restart">重新入山</button>
+      <button class="primary" data-action="new-run">重新入山</button>
+      <button class="ghost" data-action="exit-title">返回主界面</button>
     </section>
   `;
 }
@@ -310,18 +323,63 @@ function bindEvents() {
   app.querySelectorAll("[data-action]").forEach((element) => {
     element.addEventListener("click", () => {
       const action = element.dataset.action;
+      let shouldSave = true;
+
       if (action === "choose-cultivator") chooseCultivator(game, element.dataset.cultivator);
       if (action === "play-card") playCard(game, Number(element.dataset.index));
       if (action === "end-turn") endTurn(game);
       if (action === "choose-reward") addRewardCard(game, element.dataset.card);
       if (action === "skip-reward") skipReward(game);
-      if (action === "restart") game = restartGame();
-      if (action === "open-codex") showCodex(game);
-      if (action === "close-codex") closeCodex(game);
-      if (action === "toggle-log") logOpen = !logOpen;
+      if (action === "open-codex") {
+        showCodex(game);
+        shouldSave = false;
+      }
+      if (action === "close-codex") {
+        closeCodex(game);
+        shouldSave = false;
+      }
+      if (action === "toggle-log") {
+        logOpen = !logOpen;
+        shouldSave = false;
+      }
+      if (action === "exit-title") {
+        game = createGame();
+        logOpen = false;
+        shouldSave = false;
+      }
+      if (action === "new-run") {
+        game = createGame();
+        clearSave();
+        shouldSave = false;
+      }
+      if (action === "continue") {
+        game = loadGame() || createGame();
+        logOpen = false;
+        shouldSave = false;
+      }
+
+      if (shouldSave) saveGame(game);
       render();
     });
   });
+}
+
+function saveGame(value) {
+  if (!value.player) return;
+  localStorage.setItem(SAVE_KEY, JSON.stringify(value));
+}
+
+function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearSave() {
+  localStorage.removeItem(SAVE_KEY);
 }
 
 render();

@@ -1,4 +1,5 @@
 export const GAME_TITLE = "山海问道";
+export const ACT_LENGTH = 3;
 
 export const KEYWORDS = {
   lingli: {
@@ -51,6 +52,7 @@ export const CULTIVATORS = {
     maxHp: 68,
     startQi: 1,
     deck: ["windSlash", "windSlash", "windSlash", "cloudGuard", "cloudGuard", "breath", "swordSpark", "inkStep"],
+    rewards: ["swordSpark", "inkStep", "stillWater", "galeChain", "pierceStance"],
     keywords: ["jianyi", "tongxuan", "poshi"],
     stages: ["剑徒", "剑客", "剑师"],
     routes: [
@@ -69,7 +71,8 @@ export const CULTIVATORS = {
     trait: "慢热、炼化、续航。用异火灼烧敌人，再把火候炼成生机。",
     maxHp: 62,
     startQi: 0,
-    deck: ["windSlash", "windSlash", "cloudGuard", "cloudGuard", "fireTalisman", "fireTalisman", "breath", "inkStep"],
+    deck: ["emberNeedle", "emberNeedle", "cloudGuard", "cloudGuard", "fireTalisman", "fireTalisman", "breath", "inkStep"],
+    rewards: ["fireTalisman", "meridianPalm", "furnaceGuard", "ashMedicine", "emberNeedle"],
     keywords: ["yihuo", "lianhua", "huti"],
     stages: ["采药童子", "丹房弟子", "异火丹师"],
     routes: [
@@ -88,7 +91,8 @@ export const CULTIVATORS = {
     trait: "符箓、雷法、镇妖。布下雷印与符镇，等敌人露出破绽后引雷。",
     maxHp: 72,
     startQi: 0,
-    deck: ["windSlash", "windSlash", "cloudGuard", "cloudGuard", "thunderSeal", "stillWater", "breath", "meridianPalm"],
+    deck: ["talismanCut", "talismanCut", "cloudGuard", "cloudGuard", "thunderSeal", "stillWater", "breath", "meridianPalm"],
+    rewards: ["thunderSeal", "stillWater", "demonBinding", "cloudCall", "talismanCut"],
     keywords: ["leiyin", "zhenyao", "huti"],
     stages: ["道童", "箓生", "玄箓天师"],
     routes: [
@@ -107,48 +111,11 @@ export const CARD_LIBRARY = {
     kind: "剑诀",
     cost: 1,
     keywords: ["jianyi"],
-    text: "造成 7 点伤害。若有 3 点职业资源，额外造成 3 点。",
+    text: "造成 7 点伤害。若有 3 点剑意，额外造成 3 点。",
     play(game, target) {
       const bonus = game.player.qi >= 3 ? 3 : 0;
       dealDamage(game, target, 7 + bonus);
-      gainClassResource(game, game.player.cultivator === "sword" ? 1 : 0);
-    },
-  },
-  cloudGuard: {
-    id: "cloudGuard",
-    name: "云身",
-    type: "skill",
-    kind: "身法",
-    cost: 1,
-    keywords: ["huti"],
-    text: "获得 6 点护体。",
-    play(game) {
-      gainBlock(game, 6);
-    },
-  },
-  breath: {
-    id: "breath",
-    name: "吐纳",
-    type: "skill",
-    kind: "心法",
-    cost: 0,
-    keywords: ["lingli"],
-    text: "获得 2 点职业资源，抽 1 张牌。",
-    play(game) {
-      gainClassResource(game, 2);
-      drawCards(game, 1);
-    },
-  },
-  inkStep: {
-    id: "inkStep",
-    name: "墨影步",
-    type: "skill",
-    kind: "轻功",
-    cost: 0,
-    keywords: ["huti"],
-    text: "获得 3 点护体。若职业资源为 0，改为获得 5 点护体。",
-    play(game) {
-      gainBlock(game, game.player.qi === 0 ? 5 : 3);
+      gainClassResource(game, 1);
     },
   },
   swordSpark: {
@@ -164,45 +131,96 @@ export const CARD_LIBRARY = {
       gainClassResource(game, 1);
     },
   },
+  galeChain: {
+    id: "galeChain",
+    name: "连风式",
+    type: "attack",
+    kind: "剑诀",
+    cost: 1,
+    keywords: ["jianyi"],
+    text: "造成 5 点伤害。每有 2 点剑意，额外 +1 伤害。",
+    play(game, target) {
+      dealDamage(game, target, 5 + Math.floor(game.player.qi / 2));
+      gainClassResource(game, 1);
+    },
+  },
+  pierceStance: {
+    id: "pierceStance",
+    name: "破势",
+    type: "attack",
+    kind: "剑诀",
+    cost: 2,
+    keywords: ["poshi"],
+    text: "造成 12 点伤害。若敌人有护体，额外造成 5 点。",
+    play(game, target) {
+      dealDamage(game, target, 12 + (target.block > 0 ? 5 : 0));
+    },
+  },
+  emberNeedle: {
+    id: "emberNeedle",
+    name: "火针",
+    type: "attack",
+    kind: "丹火",
+    cost: 1,
+    keywords: ["yihuo"],
+    text: "造成 5 点伤害，附加 1 层异火。",
+    play(game, target) {
+      dealDamage(game, target, 5);
+      target.burn += 1;
+      gainClassResource(game, 1);
+    },
+  },
   fireTalisman: {
     id: "fireTalisman",
     name: "离火符",
     type: "attack",
-    kind: "符箓",
+    kind: "丹火",
     cost: 1,
     keywords: ["yihuo"],
-    text: "造成 4 点伤害，附加 3 层异火。异火丹师额外 +1 层。",
+    text: "造成 4 点伤害，附加 4 层异火。",
     play(game, target) {
       dealDamage(game, target, 4);
-      target.burn += game.player.cultivator === "alchemist" ? 4 : 3;
-      gainClassResource(game, game.player.cultivator === "alchemist" ? 1 : 0);
+      target.burn += 4;
+      gainClassResource(game, 1);
       log(game, `${target.name} 身上燃起异火。`);
     },
   },
-  meridianPalm: {
-    id: "meridianPalm",
-    name: "归元掌",
-    type: "attack",
-    kind: "掌法",
-    cost: 2,
-    keywords: ["lianhua"],
-    text: "造成 13 点伤害，消耗 2 点职业资源回复 3 点气血。",
-    play(game, target) {
-      dealDamage(game, target, 13);
-      if (spendClassResource(game, 2)) heal(game, 3);
+  furnaceGuard: {
+    id: "furnaceGuard",
+    name: "炉火护身",
+    type: "skill",
+    kind: "丹法",
+    cost: 1,
+    keywords: ["huti", "lianhua"],
+    text: "获得 7 点护体。若敌人有异火，额外 +3 护体。",
+    play(game) {
+      gainBlock(game, 7 + (game.enemy.burn > 0 ? 3 : 0));
     },
   },
-  stillWater: {
-    id: "stillWater",
-    name: "止水诀",
+  ashMedicine: {
+    id: "ashMedicine",
+    name: "灰烬丹",
     type: "skill",
-    kind: "心法",
+    kind: "丹药",
     cost: 1,
-    keywords: ["huti", "zhenyao"],
-    text: "获得 8 点护体。若没有手牌，获得 2 点职业资源。",
+    keywords: ["lianhua"],
+    text: "回复 4 点气血。若敌人有异火，抽 1 张牌。",
     play(game) {
-      gainBlock(game, 8);
-      if (game.player.hand.length === 0) gainClassResource(game, 2);
+      heal(game, 4);
+      if (game.enemy.burn > 0) drawCards(game, 1);
+    },
+  },
+  talismanCut: {
+    id: "talismanCut",
+    name: "符剑",
+    type: "attack",
+    kind: "符箓",
+    cost: 1,
+    keywords: ["leiyin"],
+    text: "造成 6 点伤害，获得 1 点雷印。",
+    play(game, target) {
+      dealDamage(game, target, 6);
+      gainClassResource(game, 1);
     },
   },
   thunderSeal: {
@@ -217,7 +235,96 @@ export const CARD_LIBRARY = {
       const repeat = game.player.transcendent;
       dealDamage(game, target, 10);
       if (repeat) dealDamage(game, target, 10);
-      gainClassResource(game, game.player.cultivator === "daoshi" ? 2 : 0);
+      gainClassResource(game, 2);
+    },
+  },
+  demonBinding: {
+    id: "demonBinding",
+    name: "镇妖符",
+    type: "skill",
+    kind: "符箓",
+    cost: 1,
+    keywords: ["zhenyao", "huti"],
+    text: "获得 5 点护体，敌人攻势 -1。",
+    play(game) {
+      gainBlock(game, 5);
+      game.enemy.strength = Math.max(0, game.enemy.strength - 1);
+      log(game, `${game.enemy.name} 被符箓镇住，攻势下降。`);
+    },
+  },
+  cloudCall: {
+    id: "cloudCall",
+    name: "召云",
+    type: "skill",
+    kind: "雷法",
+    cost: 0,
+    keywords: ["leiyin"],
+    text: "获得 2 点雷印。",
+    play(game) {
+      gainClassResource(game, 2);
+    },
+  },
+  cloudGuard: {
+    id: "cloudGuard",
+    name: "云身",
+    type: "skill",
+    kind: "通用",
+    cost: 1,
+    keywords: ["huti"],
+    text: "获得 6 点护体。",
+    play(game) {
+      gainBlock(game, 6);
+    },
+  },
+  breath: {
+    id: "breath",
+    name: "吐纳",
+    type: "skill",
+    kind: "通用",
+    cost: 0,
+    keywords: ["lingli"],
+    text: "获得 2 点职业资源，抽 1 张牌。",
+    play(game) {
+      gainClassResource(game, 2);
+      drawCards(game, 1);
+    },
+  },
+  inkStep: {
+    id: "inkStep",
+    name: "墨影步",
+    type: "skill",
+    kind: "身法",
+    cost: 0,
+    keywords: ["huti"],
+    text: "获得 3 点护体。若职业资源为 0，改为获得 5 点护体。",
+    play(game) {
+      gainBlock(game, game.player.qi === 0 ? 5 : 3);
+    },
+  },
+  meridianPalm: {
+    id: "meridianPalm",
+    name: "归元掌",
+    type: "attack",
+    kind: "通用",
+    cost: 2,
+    keywords: ["lianhua"],
+    text: "造成 13 点伤害，消耗 2 点职业资源回复 3 点气血。",
+    play(game, target) {
+      dealDamage(game, target, 13);
+      if (spendClassResource(game, 2)) heal(game, 3);
+    },
+  },
+  stillWater: {
+    id: "stillWater",
+    name: "止水诀",
+    type: "skill",
+    kind: "通用",
+    cost: 1,
+    keywords: ["huti", "zhenyao"],
+    text: "获得 8 点护体。若没有手牌，获得 2 点职业资源。",
+    play(game) {
+      gainBlock(game, 8);
+      if (game.player.hand.length === 0) gainClassResource(game, 2);
     },
   },
 };
@@ -262,12 +369,11 @@ const ENCOUNTERS = [
   },
 ];
 
-const REWARDS = ["swordSpark", "fireTalisman", "meridianPalm", "stillWater", "thunderSeal", "inkStep"];
-
 export function createGame() {
   return {
     screen: "start",
     floor: 1,
+    act: 1,
     rewardChoices: [],
     player: null,
     enemy: null,
@@ -289,6 +395,7 @@ export function closeCodex(game) {
 export function chooseCultivator(game, cultivatorId) {
   const cultivator = CULTIVATORS[cultivatorId];
   game.floor = 1;
+  game.act = 1;
   game.player = {
     cultivator: cultivator.id,
     name: cultivator.name,
@@ -316,10 +423,10 @@ export function startCombat(game) {
   const encounter = ENCOUNTERS[(game.floor - 1) % ENCOUNTERS.length];
   game.enemy = {
     ...encounter,
-    maxHp: encounter.maxHp + Math.floor((game.floor - 1) * 6),
-    hp: encounter.maxHp + Math.floor((game.floor - 1) * 6),
+    maxHp: encounter.maxHp,
+    hp: encounter.maxHp,
     block: 0,
-    strength: Math.floor((game.floor - 1) / 2),
+    strength: 0,
     burn: 0,
     moveIndex: 0,
     nextMove: null,
@@ -413,10 +520,19 @@ function resolveEnemyTurn(game) {
 }
 
 function winCombat(game) {
-  game.screen = "reward";
   game.enemy.hp = 0;
+  log(game, `${game.enemy.name} 败退。`);
+
+  if (game.floor >= ACT_LENGTH) {
+    game.screen = "complete";
+    game.rewardChoices = [];
+    log(game, "山脚试炼完成。");
+    return;
+  }
+
+  game.screen = "reward";
   game.rewardChoices = pickRewards(game, 3);
-  log(game, `${game.enemy.name} 败退，留下一缕机缘。`);
+  log(game, "留下一缕机缘。");
 }
 
 function chooseEnemyMove(game) {
@@ -496,7 +612,8 @@ function discardHand(game) {
 }
 
 function pickRewards(game, count) {
-  const pool = shuffle(game, [...REWARDS]);
+  const cultivator = CULTIVATORS[game.player.cultivator];
+  const pool = shuffle(game, [...cultivator.rewards]);
   return pool.slice(0, count);
 }
 
