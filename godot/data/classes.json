@@ -1,0 +1,32 @@
+{
+  "sword": {
+    "name": "剑仙",
+    "school": "凌霄剑宗",
+    "resource_name": "剑意",
+    "trait": "轻灵、连招、爆发。以剑意蓄势。",
+    "max_hp": 68,
+    "start_resource": 1,
+    "deck": ["wind_slash", "wind_slash", "wind_slash", "cloud_guard", "cloud_guard", "breath", "sword_spark", "ink_step"],
+    "rewards": ["sword_spark", "gale_chain", "pierce_stance", "cloud_guard", "ink_step"]
+  },
+  "alchemist": {
+    "name": "异火丹师",
+    "school": "焚鼎丹宗",
+    "resource_name": "火候",
+    "trait": "慢热、炼化、续航。用异火灼烧敌人。",
+    "max_hp": 62,
+    "start_resource": 0,
+    "deck": ["ember_needle", "ember_needle", "cloud_guard", "cloud_guard", "fire_talisman", "fire_talisman", "breath", "ink_step"],
+    "rewards": ["fire_talisman", "ember_needle", "furnace_guard", "ash_medicine", "cloud_guard"]
+  },
+  "daoshi": {
+    "name": "玄箓天师",
+    "school": "上清玄箓观",
+    "resource_name": "雷印",
+    "trait": "符箓、雷法、镇妖。布下雷印后引雷。",
+    "max_hp": 72,
+    "start_resource": 0,
+    "deck": ["talisman_cut", "talisman_cut", "cloud_guard", "cloud_guard", "thunder_seal", "still_water", "breath", "ink_step"],
+    "rewards": ["thunder_seal", "talisman_cut", "demon_binding", "cloud_call", "still_water"]
+  }
+}

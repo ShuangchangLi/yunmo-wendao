@@ -1,0 +1,36 @@
+[
+  {
+    "id": "wolf",
+    "name": "灰背小狼",
+    "title": "林间幼兽",
+    "max_hp": 30,
+    "moves": [
+      { "intent": "attack", "amount": 6, "label": "撕咬" },
+      { "intent": "attack", "amount": 5, "label": "连扑" },
+      { "intent": "buff", "amount": 2, "label": "嗥叫" }
+    ]
+  },
+  {
+    "id": "boar",
+    "name": "裂牙野猪",
+    "title": "山道蛮兽",
+    "max_hp": 44,
+    "moves": [
+      { "intent": "block", "amount": 8, "label": "拱地" },
+      { "intent": "attack", "amount": 13, "label": "冲撞" },
+      { "intent": "attack", "amount": 8, "label": "獠牙" }
+    ]
+  },
+  {
+    "id": "bandit",
+    "name": "黑巾强盗",
+    "title": "劫道刀客",
+    "max_hp": 52,
+    "moves": [
+      { "intent": "attack", "amount": 8, "label": "劈砍" },
+      { "intent": "block", "amount": 7, "label": "架刀" },
+      { "intent": "buff", "amount": 3, "label": "叫阵" },
+      { "intent": "attack", "amount": 12, "label": "横斩" }
+    ]
+  }
+]

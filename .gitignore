@@ -6,3 +6,5 @@ Thumbs.db
 server.out.log
 server.err.log
 npm-debug.log*
+godot/.godot/
+godot/export_presets.cfg
