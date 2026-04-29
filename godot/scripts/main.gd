@@ -2,6 +2,7 @@ extends Control
 
 const DataLoader = preload("res://scripts/data_loader.gd")
 const RunState = preload("res://scripts/run_state.gd")
+const InkMenuBackground = preload("res://scripts/ink_menu_background.gd")
 
 var classes: Dictionary
 var cards: Dictionary
@@ -26,33 +27,71 @@ func _make_root() -> VBoxContainer:
 	_clear()
 	var root := VBoxContainer.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.offset_left = 36
+	root.offset_top = 28
+	root.offset_right = -36
+	root.offset_bottom = -28
 	root.add_theme_constant_override("separation", 16)
-	root.custom_minimum_size = Vector2(960, 640)
 	add_child(root)
 	return root
 
 func _show_main_menu() -> void:
-	var root := _make_root()
-	root.add_theme_constant_override("margin_left", 36)
-	root.add_theme_constant_override("margin_top", 28)
+	_clear()
+	var background := InkMenuBackground.new()
+	background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(background)
+
+	var overlay := MarginContainer.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_theme_constant_override("margin_left", 54)
+	overlay.add_theme_constant_override("margin_top", 42)
+	overlay.add_theme_constant_override("margin_right", 54)
+	overlay.add_theme_constant_override("margin_bottom", 42)
+	add_child(overlay)
+
+	var root := VBoxContainer.new()
+	root.add_theme_constant_override("separation", 18)
+	overlay.add_child(root)
+
+	var title_panel := PanelContainer.new()
+	title_panel.custom_minimum_size = Vector2(560, 230)
+	root.add_child(title_panel)
+	var title_box := VBoxContainer.new()
+	title_box.add_theme_constant_override("separation", 8)
+	title_panel.add_child(title_box)
+
+	var seal := Label.new()
+	seal.text = "山 · 海 · 劫"
+	seal.add_theme_font_size_override("font_size", 18)
+	title_box.add_child(seal)
+
 	var title := Label.new()
 	title.text = "山海问道"
-	title.add_theme_font_size_override("font_size", 64)
-	root.add_child(title)
+	title.add_theme_font_size_override("font_size", 78)
+	title_box.add_child(title)
+
 	var subtitle := Label.new()
-	subtitle.text = "Godot vertical slice：先验证职业选择、卡牌战斗、敌人意图和奖励闭环。"
-	root.add_child(subtitle)
+	subtitle.text = "动态水墨主菜单原型。先保留代码驱动 UI，后续逐步替换成正式场景和动画。"
+	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title_box.add_child(subtitle)
+
 	var class_row := HBoxContainer.new()
 	class_row.add_theme_constant_override("separation", 12)
 	root.add_child(class_row)
 	for class_id in classes.keys():
 		var class_data: Dictionary = classes[class_id]
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(260, 170)
+		button.custom_minimum_size = Vector2(280, 180)
 		button.text = "%s\n%s\n%s" % [class_data["name"], class_data["school"], class_data["trait"]]
 		var captured_id := String(class_id)
+		button.mouse_entered.connect(func(): _pulse_button(button, 1.04))
+		button.mouse_exited.connect(func(): _pulse_button(button, 1.0))
 		button.pressed.connect(func(): _start_run(captured_id))
 		class_row.add_child(button)
+
+func _pulse_button(button: Button, target_scale: float) -> void:
+	var tween := create_tween()
+	tween.tween_property(button, "scale", Vector2(target_scale, target_scale), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func _start_run(class_id: String) -> void:
 	run.start_new(class_id)
@@ -85,7 +124,8 @@ func _show_battle() -> void:
 	root.add_child(field)
 	field.add_child(_combat_panel("玩家", run.player["name"], run.player["hp"], run.player["max_hp"], run.player["block"], ""))
 	var move: Dictionary = run.enemy["next_move"]
-	var intent_text := "%s：%s %d" % [move["label"], _intent_label(move["intent"]), int(move["amount"]) + (run.enemy["strength"] if move["intent"] == "attack" else 0)]
+	var amount: int = int(move["amount"]) + (int(run.enemy["strength"]) if move["intent"] == "attack" else 0)
+	var intent_text := "%s：%s %d" % [move["label"], _intent_label(move["intent"]), amount]
 	field.add_child(_combat_panel(run.enemy["title"], run.enemy["name"], run.enemy["hp"], run.enemy["max_hp"], run.enemy["block"], intent_text))
 
 	var hand_label := Label.new()
@@ -191,7 +231,7 @@ func _show_complete() -> void:
 	title.add_theme_font_size_override("font_size", 54)
 	root.add_child(title)
 	var body := Label.new()
-	body.text = "Godot 版第一段目标完成。下一步可以加动画、图片、存档和更正式的 UI。"
+	body.text = "Godot 版第一段目标完成。下一步可以加正式卡牌动画、敌人图和存档。"
 	root.add_child(body)
 	var back := Button.new()
 	back.text = "返回主界面"
