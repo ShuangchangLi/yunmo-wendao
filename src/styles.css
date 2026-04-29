@@ -12,6 +12,366 @@
   --line: rgba(37, 31, 24, 0.2);
 }
 
+/* Cyber-xianxia MVP skin */
+:root {
+  --cyber-bg: #060712;
+  --cyber-panel: rgba(9, 12, 28, 0.82);
+  --cyber-panel-soft: rgba(14, 18, 38, 0.72);
+  --cyber-cyan: #55f7ff;
+  --cyber-pink: #ff43d6;
+  --cyber-gold: #ffe66d;
+  --cyber-red: #ff4d6d;
+  --cyber-green: #86ff8f;
+  --cyber-text: #f7fbff;
+  --cyber-muted: rgba(224, 238, 255, 0.72);
+}
+
+body {
+  color: var(--cyber-text);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  background:
+    linear-gradient(rgba(4, 5, 13, 0.28), rgba(4, 5, 13, 0.78)),
+    url("./assets/cyber-city.svg") center / cover fixed,
+    var(--cyber-bg);
+}
+
+body:has(.start-v2) {
+  background:
+    linear-gradient(rgba(4, 5, 13, 0.18), rgba(4, 5, 13, 0.72)),
+    url("./assets/cyber-city.svg") center / cover fixed,
+    var(--cyber-bg);
+}
+
+.start-v2.cyber {
+  grid-template-rows: minmax(360px, 54vh) auto;
+}
+
+.start-hero.cyber,
+.cyber-panel,
+.cultivator-card.cyber-card,
+.panel.cyber-panel,
+.topbar.cyber-panel,
+.hand-panel.cyber-panel,
+.combatant.cyber-panel {
+  color: var(--cyber-text);
+  border: 1px solid rgba(85, 247, 255, 0.35);
+  background:
+    linear-gradient(145deg, rgba(8, 12, 28, 0.86), rgba(20, 11, 38, 0.78)),
+    var(--cyber-panel);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+}
+
+.start-hero.cyber {
+  border-color: rgba(255, 67, 214, 0.36);
+}
+
+.start-hero.cyber::after {
+  background:
+    linear-gradient(90deg, rgba(5, 8, 18, 0.92), rgba(5, 8, 18, 0.28) 64%, rgba(5, 8, 18, 0.62)),
+    linear-gradient(0deg, rgba(5, 8, 18, 0.7), transparent 48%);
+}
+
+.seal,
+.eyebrow,
+.subtitle,
+.cultivator-card small,
+.kind,
+.log p {
+  color: var(--cyber-muted);
+}
+
+.seal {
+  border-color: rgba(85, 247, 255, 0.42);
+  color: var(--cyber-cyan);
+  letter-spacing: 0;
+}
+
+.start-copy h1,
+h1 {
+  letter-spacing: 0;
+}
+
+.start-copy h1 {
+  color: var(--cyber-text);
+  text-shadow:
+    0 0 24px rgba(255, 67, 214, 0.52),
+    0 0 42px rgba(85, 247, 255, 0.28);
+}
+
+.start-copy .subtitle {
+  color: rgba(235, 246, 255, 0.82);
+}
+
+.primary,
+.end-turn {
+  border-color: rgba(255, 67, 214, 0.55);
+  color: var(--cyber-text);
+  background: linear-gradient(135deg, #2c1138, #1c2c56);
+  box-shadow: 0 0 22px rgba(255, 67, 214, 0.18);
+}
+
+.ghost,
+.ghost.light,
+.icon-button {
+  color: var(--cyber-text);
+  border-color: rgba(85, 247, 255, 0.34);
+  background: rgba(10, 16, 34, 0.58);
+}
+
+.cultivator-card.cyber-card {
+  min-height: 430px;
+  padding: 14px;
+  display: grid;
+  grid-template-rows: 190px auto auto auto auto auto;
+  gap: 8px;
+}
+
+.cultivator-card.cyber-card:hover {
+  border-color: rgba(255, 67, 214, 0.7);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.52),
+    0 0 34px rgba(85, 247, 255, 0.18);
+}
+
+.role-art {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  border: 1px solid rgba(85, 247, 255, 0.24);
+  border-radius: 8px;
+  background: rgba(5, 7, 16, 0.72);
+}
+
+.role-art,
+.route-art,
+.enemy-art {
+  object-fit: contain;
+}
+
+.role-art-large {
+  animation: cyberFloat 3.2s ease-in-out infinite;
+}
+
+.role-mark {
+  color: rgba(85, 247, 255, 0.11);
+}
+
+.cultivator-card strong {
+  color: var(--cyber-text);
+}
+
+.cultivator-card strong em {
+  color: var(--cyber-gold);
+  font-style: normal;
+  font-size: 0.72em;
+}
+
+.cultivator-card p,
+.route-card p,
+.keyword-dictionary p,
+.intent-card p,
+.keyword-popover p,
+.log-panel p {
+  color: var(--cyber-muted);
+}
+
+.stage-line li {
+  border-color: rgba(85, 247, 255, 0.22);
+  color: var(--cyber-muted);
+  background: rgba(8, 14, 30, 0.62);
+}
+
+.topbar h1 span {
+  color: var(--cyber-gold);
+  font-size: 0.72em;
+}
+
+.energy-cluster,
+.class-meter,
+.mini-stat,
+.status-badge {
+  border-color: rgba(85, 247, 255, 0.22);
+  background: rgba(7, 12, 28, 0.68);
+}
+
+.energy-cluster i,
+.class-meter i {
+  border-color: rgba(85, 247, 255, 0.28);
+  background: rgba(16, 22, 40, 0.9);
+}
+
+.energy-cluster i.filled {
+  background: radial-gradient(circle at 35% 30%, #f7ffff, var(--cyber-cyan) 58%, #12515d);
+  box-shadow: 0 0 16px rgba(85, 247, 255, 0.72);
+}
+
+.class-meter i.filled {
+  background: radial-gradient(circle at 35% 30%, #fff8c8, var(--cyber-pink) 62%, #531249);
+  box-shadow: 0 0 14px rgba(255, 67, 214, 0.68);
+}
+
+.cyber-field {
+  position: relative;
+}
+
+.cyber-field::before {
+  content: "";
+  position: absolute;
+  inset: 10% 4%;
+  pointer-events: none;
+  border-top: 1px solid rgba(85, 247, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 67, 214, 0.12);
+  transform: skewY(-3deg);
+}
+
+.clash-mark {
+  border-color: rgba(255, 230, 109, 0.48);
+  color: var(--cyber-gold);
+  background: rgba(9, 12, 28, 0.76);
+  box-shadow: 0 0 30px rgba(255, 230, 109, 0.16);
+}
+
+.enemy-art {
+  border-color: rgba(85, 247, 255, 0.28);
+  background: rgba(5, 8, 18, 0.72);
+}
+
+.intent-card,
+.focus-card {
+  border-color: rgba(255, 67, 214, 0.48);
+  color: var(--cyber-text);
+  background: rgba(9, 12, 28, 0.86);
+  box-shadow: 0 0 24px rgba(255, 67, 214, 0.16);
+}
+
+.intent-card span,
+.focus-card span {
+  background: var(--cyber-pink);
+}
+
+.intent-card.block span {
+  background: var(--cyber-cyan);
+}
+
+.intent-card.buff span {
+  color: #161306;
+  background: var(--cyber-gold);
+}
+
+.intent-card.focus span {
+  background: var(--cyber-cyan);
+}
+
+.hp-strip {
+  border-color: rgba(85, 247, 255, 0.24);
+  background: rgba(6, 8, 18, 0.86);
+}
+
+.hp-strip i {
+  background: linear-gradient(90deg, #ff315d, #ff7a55);
+}
+
+.player .hp-strip i {
+  background: linear-gradient(90deg, #1989a7, var(--cyber-cyan));
+}
+
+.shield {
+  border-color: rgba(85, 247, 255, 0.24);
+  color: var(--cyber-muted);
+  background: rgba(7, 12, 28, 0.74);
+}
+
+.shield.active {
+  border-color: rgba(85, 247, 255, 0.82);
+  background: linear-gradient(160deg, #12626c, #102f52);
+  box-shadow: 0 0 18px rgba(85, 247, 255, 0.42);
+}
+
+.hand-panel {
+  bottom: 8px;
+}
+
+.card {
+  color: var(--cyber-text);
+  border-color: rgba(85, 247, 255, 0.24);
+  background:
+    linear-gradient(160deg, rgba(15, 20, 42, 0.96), rgba(39, 17, 56, 0.88)),
+    #10162a;
+}
+
+.card::after,
+.cultivator-card::after,
+.combatant::after {
+  background:
+    linear-gradient(120deg, transparent, rgba(85, 247, 255, 0.08), transparent),
+    radial-gradient(circle at 50% 0%, rgba(255, 67, 214, 0.12), transparent 42%);
+  mix-blend-mode: screen;
+}
+
+.card:hover:not(:disabled) {
+  border-color: rgba(255, 67, 214, 0.74);
+  box-shadow:
+    0 28px 58px rgba(0, 0, 0, 0.52),
+    0 0 0 3px rgba(85, 247, 255, 0.12),
+    0 0 34px rgba(255, 67, 214, 0.28);
+}
+
+.cost {
+  color: #061018;
+  background: radial-gradient(circle at 35% 30%, #f7ffff, var(--cyber-cyan) 62%, #12515d);
+}
+
+.attack {
+  border-bottom-color: rgba(255, 77, 109, 0.9);
+}
+
+.skill {
+  border-bottom-color: rgba(85, 247, 255, 0.9);
+}
+
+.keyword-chip {
+  border-color: rgba(85, 247, 255, 0.26);
+  color: var(--cyber-cyan);
+  background: rgba(8, 14, 30, 0.72);
+}
+
+.keyword-popover {
+  color: var(--cyber-text);
+  border-color: rgba(85, 247, 255, 0.28);
+  background: rgba(8, 12, 28, 0.96);
+}
+
+.log-panel {
+  background: rgba(8, 12, 28, 0.94);
+}
+
+.route-card,
+.keyword-dictionary article {
+  border-color: rgba(85, 247, 255, 0.2);
+  background: rgba(7, 12, 28, 0.62);
+}
+
+.route-art {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border: 1px solid rgba(85, 247, 255, 0.24);
+  border-radius: 8px;
+}
+
+@keyframes cyberFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -1147,4 +1507,266 @@ h1 {
     width: min(300px, calc(100vw - 52px));
     transform: translateX(calc(100% - 44px));
   }
+}
+
+/* Final cyber skin overrides kept after the legacy MVP stylesheet. */
+body {
+  color: var(--cyber-text);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  background:
+    linear-gradient(rgba(4, 5, 13, 0.28), rgba(4, 5, 13, 0.78)),
+    url("./assets/cyber-city.svg") center / cover fixed,
+    var(--cyber-bg);
+}
+
+body:has(.start-v2) {
+  background:
+    linear-gradient(rgba(4, 5, 13, 0.18), rgba(4, 5, 13, 0.72)),
+    url("./assets/cyber-city.svg") center / cover fixed,
+    var(--cyber-bg);
+}
+
+.start-hero.cyber,
+.cyber-panel,
+.cultivator-card.cyber-card,
+.panel.cyber-panel,
+.topbar.cyber-panel,
+.hand-panel.cyber-panel,
+.combatant.cyber-panel {
+  color: var(--cyber-text);
+  border: 1px solid rgba(85, 247, 255, 0.35);
+  background:
+    linear-gradient(145deg, rgba(8, 12, 28, 0.86), rgba(20, 11, 38, 0.78)),
+    var(--cyber-panel);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+}
+
+.start-hero.cyber::after {
+  background:
+    linear-gradient(90deg, rgba(5, 8, 18, 0.92), rgba(5, 8, 18, 0.28) 64%, rgba(5, 8, 18, 0.62)),
+    linear-gradient(0deg, rgba(5, 8, 18, 0.7), transparent 48%);
+}
+
+.seal,
+.eyebrow,
+.subtitle,
+.cultivator-card small,
+.kind,
+.log p {
+  color: var(--cyber-muted);
+}
+
+.seal {
+  border-color: rgba(85, 247, 255, 0.42);
+  color: var(--cyber-cyan);
+  letter-spacing: 0;
+}
+
+.start-copy h1,
+h1 {
+  letter-spacing: 0;
+}
+
+.start-copy h1 {
+  color: var(--cyber-text);
+  text-shadow:
+    0 0 24px rgba(255, 67, 214, 0.52),
+    0 0 42px rgba(85, 247, 255, 0.28);
+}
+
+.primary,
+.end-turn {
+  border-color: rgba(255, 67, 214, 0.55);
+  color: var(--cyber-text);
+  background: linear-gradient(135deg, #2c1138, #1c2c56);
+  box-shadow: 0 0 22px rgba(255, 67, 214, 0.18);
+}
+
+.ghost,
+.ghost.light,
+.icon-button {
+  color: var(--cyber-text);
+  border-color: rgba(85, 247, 255, 0.34);
+  background: rgba(10, 16, 34, 0.58);
+}
+
+.cultivator-card.cyber-card {
+  min-height: 430px;
+  padding: 14px;
+  display: grid;
+  grid-template-rows: 190px auto auto auto auto auto;
+  gap: 8px;
+}
+
+.role-art {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  border: 1px solid rgba(85, 247, 255, 0.24);
+  border-radius: 8px;
+  background: rgba(5, 7, 16, 0.72);
+}
+
+.role-art-large {
+  animation: cyberFloat 3.2s ease-in-out infinite;
+}
+
+.role-mark {
+  color: rgba(85, 247, 255, 0.11);
+}
+
+.cultivator-card strong,
+.card strong,
+.route-card h3,
+.codex h1,
+.codex h2,
+.combatant h2,
+.topbar h1 {
+  color: var(--cyber-text);
+}
+
+.cultivator-card strong em,
+.topbar h1 span {
+  color: var(--cyber-gold);
+  font-style: normal;
+}
+
+.cultivator-card p,
+.route-card p,
+.keyword-dictionary p,
+.intent-card p,
+.keyword-popover p,
+.log-panel p,
+.card p {
+  color: var(--cyber-muted);
+}
+
+.stage-line li,
+.energy-cluster,
+.class-meter,
+.mini-stat,
+.status-badge,
+.route-card,
+.keyword-dictionary article {
+  border-color: rgba(85, 247, 255, 0.22);
+  background: rgba(7, 12, 28, 0.68);
+}
+
+.energy-cluster i.filled {
+  background: radial-gradient(circle at 35% 30%, #f7ffff, var(--cyber-cyan) 58%, #12515d);
+  box-shadow: 0 0 16px rgba(85, 247, 255, 0.72);
+}
+
+.class-meter i.filled {
+  background: radial-gradient(circle at 35% 30%, #fff8c8, var(--cyber-pink) 62%, #531249);
+  box-shadow: 0 0 14px rgba(255, 67, 214, 0.68);
+}
+
+.clash-mark {
+  border-color: rgba(255, 230, 109, 0.48);
+  color: var(--cyber-gold);
+  background: rgba(9, 12, 28, 0.76);
+  box-shadow: 0 0 30px rgba(255, 230, 109, 0.16);
+}
+
+.enemy-art {
+  border-color: rgba(85, 247, 255, 0.28);
+  background: rgba(5, 8, 18, 0.72);
+}
+
+.intent-card,
+.focus-card {
+  border-color: rgba(255, 67, 214, 0.48);
+  color: var(--cyber-text);
+  background: rgba(9, 12, 28, 0.86);
+  box-shadow: 0 0 24px rgba(255, 67, 214, 0.16);
+}
+
+.intent-card span,
+.focus-card span {
+  background: var(--cyber-pink);
+}
+
+.intent-card.block span {
+  background: var(--cyber-cyan);
+}
+
+.intent-card.buff span {
+  color: #161306;
+  background: var(--cyber-gold);
+}
+
+.intent-card.focus span {
+  background: var(--cyber-cyan);
+}
+
+.hp-strip {
+  border-color: rgba(85, 247, 255, 0.24);
+  background: rgba(6, 8, 18, 0.86);
+}
+
+.hp-strip i {
+  background: linear-gradient(90deg, #ff315d, #ff7a55);
+}
+
+.player .hp-strip i {
+  background: linear-gradient(90deg, #1989a7, var(--cyber-cyan));
+}
+
+.shield {
+  border-color: rgba(85, 247, 255, 0.24);
+  color: var(--cyber-muted);
+  background: rgba(7, 12, 28, 0.74);
+}
+
+.shield.active {
+  border-color: rgba(85, 247, 255, 0.82);
+  background: linear-gradient(160deg, #12626c, #102f52);
+  box-shadow: 0 0 18px rgba(85, 247, 255, 0.42);
+}
+
+.card {
+  color: var(--cyber-text);
+  border-color: rgba(85, 247, 255, 0.24);
+  background:
+    linear-gradient(160deg, rgba(15, 20, 42, 0.96), rgba(39, 17, 56, 0.88)),
+    #10162a;
+}
+
+.card:hover:not(:disabled) {
+  border-color: rgba(255, 67, 214, 0.74);
+  box-shadow:
+    0 28px 58px rgba(0, 0, 0, 0.52),
+    0 0 0 3px rgba(85, 247, 255, 0.12),
+    0 0 34px rgba(255, 67, 214, 0.28);
+}
+
+.cost {
+  color: #061018;
+  background: radial-gradient(circle at 35% 30%, #f7ffff, var(--cyber-cyan) 62%, #12515d);
+}
+
+.keyword-chip {
+  border-color: rgba(85, 247, 255, 0.26);
+  color: var(--cyber-cyan);
+  background: rgba(8, 14, 30, 0.72);
+}
+
+.keyword-popover,
+.log-panel {
+  color: var(--cyber-text);
+  border-color: rgba(85, 247, 255, 0.28);
+  background: rgba(8, 12, 28, 0.96);
+}
+
+.route-art {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border: 1px solid rgba(85, 247, 255, 0.24);
+  border-radius: 8px;
 }

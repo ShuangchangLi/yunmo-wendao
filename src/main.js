@@ -1,4 +1,5 @@
 import {
+  ACT_LENGTH,
   CARD_LIBRARY,
   CULTIVATORS,
   GAME_TITLE,
@@ -14,7 +15,7 @@ import {
   skipReward,
 } from "./game.js";
 
-const SAVE_KEY = "shan-hai-wen-dao-save";
+const SAVE_KEY = "nixu-wendao-save";
 
 let game = createGame();
 let logOpen = false;
@@ -37,21 +38,21 @@ function renderScreen() {
 function renderStart() {
   const hasSave = Boolean(loadGame());
   return `
-    <section class="start-v2">
-      <div class="start-hero">
-        <img src="./src/assets/ink-mountain.svg" alt="" />
+    <section class="start-v2 cyber">
+      <div class="start-hero cyber">
+        <img src="./src/assets/cyber-city.svg" alt="" />
         <div class="start-copy">
-          <p class="seal">山 · 海 · 劫</p>
+          <p class="seal">天机城夜巡 / 三战 MVP</p>
           <h1>${GAME_TITLE}</h1>
-          <p class="subtitle">一卷水墨山海，一场入世问道。先完成山脚三战：小狼、野猪、强盗。</p>
+          <p class="subtitle">底层身份修成大道。灵污清洁工、社畜、灵网主播，从霓虹雨夜里打出自己的第一段道途。</p>
           <div class="start-menu">
-            <button class="primary" data-action="new-run">新的试炼</button>
-            <button class="ghost light" data-action="continue" ${hasSave ? "" : "disabled"}>继续游戏</button>
-            <button class="ghost light" data-action="open-codex">查看图鉴</button>
+            <button class="primary" data-action="new-run">新的夜巡</button>
+            <button class="ghost light" data-action="continue" ${hasSave ? "" : "disabled"}>继续存档</button>
+            <button class="ghost light" data-action="open-codex">天机档案</button>
           </div>
         </div>
       </div>
-      <section class="cultivator-grid compact" aria-label="选择角色">
+      <section class="cultivator-grid compact" aria-label="选择入城身份">
         ${Object.values(CULTIVATORS).map(renderCultivator).join("")}
       </section>
     </section>
@@ -60,9 +61,10 @@ function renderStart() {
 
 function renderCultivator(cultivator) {
   return `
-    <button class="cultivator-card" data-action="choose-cultivator" data-cultivator="${cultivator.id}">
+    <button class="cultivator-card cyber-card ${cultivator.id}" data-action="choose-cultivator" data-cultivator="${cultivator.id}">
+      <img class="role-art" src="${cultivator.avatar}" alt="" />
       <span class="role-mark">${cultivator.mark}</span>
-      <strong>${cultivator.name}</strong>
+      <strong>${cultivator.name} <em>-> ${cultivator.finalTitle}</em></strong>
       <small>${cultivator.school}</small>
       <p>${cultivator.trait}</p>
       <div class="keyword-row">${cultivator.keywords.map(keywordChip).join("")}</div>
@@ -73,28 +75,28 @@ function renderCultivator(cultivator) {
 
 function renderCombat() {
   return `
-    <section class="combat-layout v2">
-      <header class="topbar">
+    <section class="combat-layout v2 cyber">
+      <header class="topbar cyber-panel">
         <div>
-          <p class="eyebrow">第 ${game.floor} 战 / 山脚试炼</p>
-          <h1>${game.player.name}</h1>
+          <p class="eyebrow">第 ${game.floor} 战 / ${ACT_LENGTH} 战短线夜巡</p>
+          <h1>${game.player.name} <span>${game.player.finalTitle}</span></h1>
         </div>
         <div class="combat-resources">
           ${energyOrbs(game.player.energy, game.player.maxEnergy)}
           ${classMeter(game.player.resourceName, game.player.qi, game.player.maxQi, game.player.transcendent)}
           <button class="icon-button" data-action="exit-title" title="返回主界面">退</button>
-          <button class="icon-button" data-action="open-codex" title="图鉴">鉴</button>
-          <button class="icon-button" data-action="toggle-log" title="战史">史</button>
+          <button class="icon-button" data-action="open-codex" title="天机档案">档</button>
+          <button class="icon-button" data-action="toggle-log" title="战斗历史">史</button>
         </div>
       </header>
 
-      <section class="battlefield v2">
+      <section class="battlefield v2 cyber-field">
         ${renderCombatant("player")}
         <div class="clash-mark">对</div>
         ${renderCombatant("enemy")}
       </section>
 
-      <section class="hand-panel">
+      <section class="hand-panel cyber-panel">
         <div class="pile-row">
           ${miniStat("抽牌", game.player.drawPile.length)}
           ${miniStat("弃牌", game.player.discardPile.length)}
@@ -103,7 +105,7 @@ function renderCombat() {
         <div class="hand">
           ${game.player.hand.map((cardId, index) => cardButton(cardId, "play", index)).join("")}
         </div>
-        <button class="end-turn" data-action="end-turn">收势</button>
+        <button class="end-turn" data-action="end-turn">结束回合</button>
       </section>
 
       ${renderLogDrawer()}
@@ -117,11 +119,11 @@ function renderCombatant(side) {
   const hpMax = unit.maxHp;
   const hp = unit.hp;
   return `
-    <article class="combatant ${side} v2">
+    <article class="combatant ${side} v2 cyber-panel">
       <div class="unit-top ${isEnemy ? "" : "player-top"}">
-        ${isEnemy ? enemyIntent() : ""}
+        ${isEnemy ? enemyIntent() : playerFocus()}
         <div class="portrait-frame">
-          ${isEnemy ? `<img class="enemy-art" src="${unit.art}" alt="${unit.name}" />` : `<div class="ink-figure">人</div>`}
+          <img class="enemy-art role-art-large" src="${isEnemy ? unit.art : unit.avatar}" alt="${unit.name}" />
         </div>
       </div>
       <div class="combatant-title">
@@ -139,23 +141,30 @@ function renderCombatant(side) {
         </div>
       </div>
       <div class="status-row">
-        ${isEnemy ? statusBadge("攻势", unit.strength) + statusBadge("异火", unit.burn) : statusBadge(unit.resourceName, unit.qi) + statusBadge("力道", unit.strength)}
-        ${!isEnemy && unit.transcendent ? statusBadge("通玄", "已成") : ""}
+        ${isEnemy ? statusBadge("攻势", unit.strength) + statusBadge("灼痕", unit.burn) : statusBadge(unit.resourceName, unit.qi) + statusBadge("通玄", unit.transcendent ? "已成" : "未成")}
       </div>
     </article>
+  `;
+}
+
+function playerFocus() {
+  return `
+    <div class="intent-card focus">
+      <span>道</span>
+      <strong>身份修行</strong>
+      <p>资源满后进入通玄，下一张伤害牌额外 +8。</p>
+    </div>
   `;
 }
 
 function enemyIntent() {
   const move = game.enemy.nextMove;
   const amount = move.amount + (move.intent === "attack" ? game.enemy.strength : 0);
-  const label = move.intent === "attack" ? "将造成" : move.intent === "block" ? "将获得" : "将强化";
-  const unit = move.intent === "attack" ? "伤害" : move.intent === "block" ? "护体" : "攻势";
   return `
     <div class="intent-card ${move.intent}">
       <span>${intentIcon(move.intent)}</span>
       <strong>${move.label}</strong>
-      <p>${label} ${amount} ${unit}</p>
+      <p>${intentLabel(move.intent)} ${amount}</p>
     </div>
   `;
 }
@@ -164,7 +173,7 @@ function renderLogDrawer() {
   return `
     <aside class="log-drawer ${logOpen ? "open" : ""}">
       <button class="log-tab" data-action="toggle-log">${logOpen ? "收起" : "战史"}</button>
-      <div class="log-panel">
+      <div class="log-panel cyber-panel">
         <h2>战斗历史</h2>
         ${game.log.map((entry) => `<p>${entry}</p>`).join("")}
       </div>
@@ -174,13 +183,14 @@ function renderLogDrawer() {
 
 function renderReward() {
   return `
-    <section class="reward panel">
-      <p class="seal">一线机缘</p>
-      <h1>择一门新法</h1>
+    <section class="reward panel cyber-panel">
+      <p class="seal">法诀芯片</p>
+      <h1>截获一枚新法诀</h1>
+      <p>选一张加入牌组。当前 MVP 先保持基础战斗，职业成长系统后面再接。</p>
       <div class="reward-grid">
         ${game.rewardChoices.map((cardId) => cardButton(cardId, "reward")).join("")}
       </div>
-      <button class="ghost" data-action="skip-reward">不取机缘</button>
+      <button class="ghost" data-action="skip-reward">跳过</button>
       <button class="ghost" data-action="exit-title">返回主界面</button>
     </section>
   `;
@@ -188,10 +198,10 @@ function renderReward() {
 
 function renderComplete() {
   return `
-    <section class="panel end-state">
-      <p class="seal">试炼完成</p>
-      <h1>山脚已清</h1>
-      <p>你击退了小狼、野猪与强盗。第一段短程目标完成，下一步可以进入山门事件、路线选择或职业升级。</p>
+    <section class="panel end-state cyber-panel">
+      <p class="seal">夜巡完成</p>
+      <h1>第一段试炼完成</h1>
+      <p>你击退了霓灯犬、铁鬃械猪和黑巷劫修。三职业、三场战斗、基础卡牌循环和赛博修仙视觉已经跑通。</p>
       <button class="primary" data-action="new-run">再来一轮</button>
       <button class="ghost" data-action="exit-title">返回主界面</button>
     </section>
@@ -200,11 +210,11 @@ function renderComplete() {
 
 function renderDefeat() {
   return `
-    <section class="panel end-state">
-      <p class="seal">道阻</p>
-      <h1>此劫未渡</h1>
-      <p>气海崩散，但残卷仍在。下一次入山，招式会更清晰。</p>
-      <button class="primary" data-action="new-run">重新入山</button>
+    <section class="panel end-state cyber-panel">
+      <p class="seal">夜巡中断</p>
+      <h1>气海崩散</h1>
+      <p>天机城还在下雨。下一次入城，牌序会不同。</p>
+      <button class="primary" data-action="new-run">重新夜巡</button>
       <button class="ghost" data-action="exit-title">返回主界面</button>
     </section>
   `;
@@ -212,17 +222,17 @@ function renderDefeat() {
 
 function renderCodex() {
   return `
-    <section class="codex panel">
+    <section class="codex panel cyber-panel">
       <div class="codex-head">
         <div>
-          <p class="seal">图鉴</p>
-          <h1>道卷总览</h1>
+          <p class="seal">天机档案</p>
+          <h1>霓墟资料库</h1>
         </div>
         <button class="ghost" data-action="close-codex">返回</button>
       </div>
 
       <section class="codex-section">
-        <h2>职业与路线</h2>
+        <h2>入城身份</h2>
         <div class="codex-grid">
           ${Object.values(CULTIVATORS).map(renderRouteCard).join("")}
         </div>
@@ -238,7 +248,7 @@ function renderCodex() {
       <section class="codex-section">
         <h2>关键词</h2>
         <div class="keyword-dictionary">
-          ${Object.entries(KEYWORDS).map(([id, keyword]) => `<article><strong>${keyword.name}</strong><p>${keyword.text}</p></article>`).join("")}
+          ${Object.entries(KEYWORDS).map(([, keyword]) => `<article><strong>${keyword.name}</strong><p>${keyword.text}</p></article>`).join("")}
         </div>
       </section>
     </section>
@@ -248,13 +258,11 @@ function renderCodex() {
 function renderRouteCard(cultivator) {
   return `
     <article class="route-card">
+      <img class="route-art" src="${cultivator.avatar}" alt="" />
       <span class="role-mark small">${cultivator.mark}</span>
-      <h3>${cultivator.name}</h3>
+      <h3>${cultivator.name} -> ${cultivator.finalTitle}</h3>
       <p>${cultivator.trait}</p>
       <ol class="stage-line expanded">${cultivator.stages.map((stage) => `<li>${stage}</li>`).join("")}</ol>
-      <div class="route-list">
-        ${cultivator.routes.map((route) => `<div><strong>${route.name}</strong><span>${route.alignment}</span><p>${route.text}</p></div>`).join("")}
-      </div>
     </article>
   `;
 }
@@ -289,8 +297,8 @@ function keywordPopover(ids) {
 
 function energyOrbs(current, max) {
   return `
-    <div class="energy-cluster" aria-label="灵力 ${current}/${max}">
-      <span>灵力</span>
+    <div class="energy-cluster" aria-label="灵能 ${current}/${max}">
+      <span>灵能</span>
       <div>${Array.from({ length: max }, (_, index) => `<i class="${index < current ? "filled" : ""}"></i>`).join("")}</div>
     </div>
   `;
@@ -316,7 +324,13 @@ function statusBadge(label, value) {
 function intentIcon(intent) {
   if (intent === "attack") return "杀";
   if (intent === "block") return "守";
-  return "势";
+  return "频";
+}
+
+function intentLabel(intent) {
+  if (intent === "attack") return "将造成";
+  if (intent === "block") return "将获得护体";
+  return "将强化攻势";
 }
 
 function bindEvents() {
@@ -348,8 +362,9 @@ function bindEvents() {
         shouldSave = false;
       }
       if (action === "new-run") {
-        game = createGame();
+        game = restartGame();
         clearSave();
+        logOpen = false;
         shouldSave = false;
       }
       if (action === "continue") {

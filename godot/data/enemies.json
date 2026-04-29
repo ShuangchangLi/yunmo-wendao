@@ -1,36 +1,39 @@
 [
   {
-    "id": "wolf",
-    "name": "灰背小狼",
-    "title": "林间幼兽",
-    "max_hp": 30,
+    "id": "neon_hound",
+    "name": "霓灯犬",
+    "title": "巷口灵污兽",
+    "visual": "neon_hound",
+    "max_hp": 32,
     "moves": [
       { "intent": "attack", "amount": 6, "label": "撕咬" },
-      { "intent": "attack", "amount": 5, "label": "连扑" },
-      { "intent": "buff", "amount": 2, "label": "嗥叫" }
+      { "intent": "attack", "amount": 5, "label": "追光扑" },
+      { "intent": "buff", "amount": 2, "label": "嗅血" }
     ]
   },
   {
-    "id": "boar",
-    "name": "裂牙野猪",
-    "title": "山道蛮兽",
-    "max_hp": 44,
+    "id": "iron_boar",
+    "name": "铁鬃械猪",
+    "title": "废矿改造妖兽",
+    "visual": "iron_boar",
+    "max_hp": 46,
     "moves": [
-      { "intent": "block", "amount": 8, "label": "拱地" },
+      { "intent": "block", "amount": 8, "label": "铁鬃蓄能" },
       { "intent": "attack", "amount": 13, "label": "冲撞" },
-      { "intent": "attack", "amount": 8, "label": "獠牙" }
+      { "intent": "attack", "amount": 8, "label": "断轨獠牙" }
     ]
   },
   {
-    "id": "bandit",
-    "name": "黑巾强盗",
-    "title": "劫道刀客",
-    "max_hp": 52,
+    "id": "alley_raider",
+    "name": "黑巷劫修",
+    "title": "非法法诀芯片贩",
+    "visual": "alley_raider",
+    "max_hp": 54,
     "moves": [
-      { "intent": "attack", "amount": 8, "label": "劈砍" },
-      { "intent": "block", "amount": 7, "label": "架刀" },
-      { "intent": "buff", "amount": 3, "label": "叫阵" },
-      { "intent": "attack", "amount": 12, "label": "横斩" }
+      { "intent": "attack", "amount": 8, "label": "劫刃" },
+      { "intent": "block", "amount": 7, "label": "黑市护符" },
+      { "intent": "buff", "amount": 3, "label": "嗑药提频" },
+      { "intent": "attack", "amount": 12, "label": "断脉斩" }
     ]
   }
 ]

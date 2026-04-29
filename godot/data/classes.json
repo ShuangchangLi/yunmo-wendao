@@ -1,32 +1,41 @@
 {
-  "sword": {
-    "name": "剑仙",
-    "school": "凌霄剑宗",
-    "resource_name": "剑意",
-    "trait": "轻灵、连招、爆发。以剑意蓄势。",
-    "max_hp": 68,
+  "cleaner": {
+    "name": "灵污清洁工",
+    "final_title": "霓刃剑仙",
+    "school": "环卫司外勤",
+    "resource_name": "清浊",
+    "trait": "以清洁刀、灵污罐和霓光飞刃作战。擅长低费连击、破盾和清除污染。",
+    "visual": "cleaner",
+    "mark": "净",
+    "max_hp": 70,
     "start_resource": 1,
-    "deck": ["wind_slash", "wind_slash", "wind_slash", "cloud_guard", "cloud_guard", "breath", "sword_spark", "ink_step"],
-    "rewards": ["sword_spark", "gale_chain", "pierce_stance", "cloud_guard", "ink_step"]
+    "deck": ["sweep_cut", "sweep_cut", "sweep_cut", "filter_guard", "filter_guard", "breath", "recycle_edge", "dust_step"],
+    "rewards": ["recycle_edge", "neon_backhand", "filter_guard", "dust_step", "clean_break"]
   },
-  "alchemist": {
-    "name": "异火丹师",
-    "school": "焚鼎丹宗",
-    "resource_name": "火候",
-    "trait": "慢热、炼化、续航。用异火灼烧敌人。",
-    "max_hp": 62,
+  "worker": {
+    "name": "社畜",
+    "final_title": "兽相真君",
+    "school": "天机城庶务楼",
+    "resource_name": "兽性",
+    "trait": "被工时、丹药和义体压到兽化。擅长承压、反打和狂化爆发。",
+    "visual": "worker",
+    "mark": "兽",
+    "max_hp": 78,
     "start_resource": 0,
-    "deck": ["ember_needle", "ember_needle", "cloud_guard", "cloud_guard", "fire_talisman", "fire_talisman", "breath", "ink_step"],
-    "rewards": ["fire_talisman", "ember_needle", "furnace_guard", "ash_medicine", "cloud_guard"]
+    "deck": ["overtime_claw", "overtime_claw", "overtime_claw", "deadline_guard", "deadline_guard", "breath", "bone_growth", "last_train"],
+    "rewards": ["bone_growth", "overtime_claw", "deadline_guard", "rage_commute", "beast_shift"]
   },
-  "daoshi": {
-    "name": "玄箓天师",
-    "school": "上清玄箓观",
-    "resource_name": "雷印",
-    "trait": "符箓、雷法、镇妖。布下雷印后引雷。",
-    "max_hp": 72,
+  "streamer": {
+    "name": "灵网主播",
+    "final_title": "香火神女",
+    "school": "万象直播台",
+    "resource_name": "人气",
+    "trait": "把弹幕、打赏和注目修成香火神通。擅长控场、护体和热度爆发。",
+    "visual": "streamer",
+    "mark": "愿",
+    "max_hp": 64,
     "start_resource": 0,
-    "deck": ["talisman_cut", "talisman_cut", "cloud_guard", "cloud_guard", "thunder_seal", "still_water", "breath", "ink_step"],
-    "rewards": ["thunder_seal", "talisman_cut", "demon_binding", "cloud_call", "still_water"]
+    "deck": ["go_live", "go_live", "go_live", "bullet_guard", "bullet_guard", "breath", "hot_search", "spotlight_step"],
+    "rewards": ["hot_search", "bullet_guard", "fan_mirror", "go_live", "crowd_focus"]
   }
 }

@@ -1,386 +1,200 @@
-export const GAME_TITLE = "山海问道";
+export const GAME_TITLE = "霓墟问道";
 export const ACT_LENGTH = 3;
 
 export const KEYWORDS = {
-  lingli: {
-    name: "灵力",
-    text: "本回合可用的行动点。打出卡牌会消耗灵力，回合开始恢复到上限。",
-  },
-  huti: {
-    name: "护体",
-    text: "抵挡即将受到的伤害。玩家护体会在自己的回合开始时清空。",
-  },
-  jianyi: {
-    name: "剑意",
-    text: "剑仙的职业资源。打出剑诀积累剑意，满 6 点进入通玄，下一张攻击额外造成 8 点伤害。",
-  },
-  yihuo: {
-    name: "异火",
-    text: "附着在敌人身上的火焰。回合开始造成等同层数的伤害，然后减少 1 层。",
-  },
-  lianhua: {
-    name: "炼化",
-    text: "消耗或利用异火，把伤害转化为回复、抽牌或护体等效果。",
-  },
-  leiyin: {
-    name: "雷印",
-    text: "玄箓天师的道法标记。满 6 点引动天雷，下一张攻击额外造成 8 点伤害。",
-  },
-  zhenyao: {
-    name: "镇妖",
-    text: "降低敌人的下一次攻势，或让敌人在带有负面状态时承受额外效果。",
-  },
-  tongxuan: {
-    name: "通玄",
-    text: "职业资源满后获得的爆发状态。下一张攻击牌得到额外效果，触发后消失。",
-  },
-  poshi: {
-    name: "破势",
-    text: "攻击更擅长穿透防守。MVP 中表现为额外伤害或对有护体目标更强。",
-  },
+  lingli: { name: "灵能", text: "本回合可用的行动点。每回合开始恢复到上限。" },
+  huti: { name: "护体", text: "抵挡即将受到的伤害。玩家护体会在自己的回合开始时清空。" },
+  tongxuan: { name: "通玄", text: "职业资源满后进入爆发状态，下一张造成伤害的牌额外 +8。" },
+  qingzhuo: { name: "清浊", text: "灵污清洁工的职业资源。清掉污秽，最后化作霓刃剑势。" },
+  huifeng: { name: "回锋", text: "偏向连击和抽牌的剑路关键词。" },
+  powang: { name: "破网", text: "针对护盾、增益和灵网防御的破坏性剑路。" },
+  shouxing: { name: "兽性", text: "社畜兽化路线的职业资源。压力越高，爆发越凶。" },
+  chengya: { name: "承压", text: "用护体和资源把压力转化为反击机会。" },
+  kuanghua: { name: "狂化", text: "高风险高输出的兽相关键词。" },
+  renqi: { name: "人气", text: "灵网主播的职业资源。观众的注目会变成香火神通。" },
+  danmu: { name: "弹幕", text: "围绕护体、干扰和控场的灵网关键词。" },
+  zhumu: { name: "注目", text: "让敌人暴露在众目之下，转化为灼痕或爆发伤害。" },
 };
 
 export const CULTIVATORS = {
-  sword: {
-    id: "sword",
-    name: "剑仙",
-    school: "凌霄剑宗",
-    mark: "剑",
-    resourceName: "剑意",
-    resourceKeyword: "jianyi",
-    trait: "轻灵、连招、爆发。以剑意蓄势，通玄后下一击斩开敌势。",
-    maxHp: 68,
+  cleaner: {
+    id: "cleaner",
+    name: "灵污清洁工",
+    finalTitle: "霓刃剑仙",
+    school: "环卫司外勤",
+    mark: "净",
+    avatar: "./src/assets/generated/unit-cleaner.png",
+    resourceName: "清浊",
+    resourceKeyword: "qingzhuo",
+    trait: "以清洁刀、灵污罐和霓光飞刃作战。擅长低费连击、破盾和清除污染。",
+    maxHp: 70,
     startQi: 1,
-    deck: ["windSlash", "windSlash", "windSlash", "cloudGuard", "cloudGuard", "breath", "swordSpark", "inkStep"],
-    rewards: ["swordSpark", "inkStep", "stillWater", "galeChain", "pierceStance"],
-    keywords: ["jianyi", "tongxuan", "poshi"],
-    stages: ["剑徒", "剑客", "剑师"],
-    routes: [
-      { name: "仙剑师", alignment: "正路", text: "御剑凌空，剑意更容易转化为多段攻击。" },
-      { name: "邪剑客", alignment: "邪路", text: "以气血换伤害，剑招更凶，防守更薄。" },
-      { name: "剑二十一", alignment: "隐藏", text: "追求极限剑境，围绕二十一式连斩构筑。" },
-    ],
+    deck: ["sweepCut", "sweepCut", "sweepCut", "filterGuard", "filterGuard", "breath", "recycleEdge", "dustStep"],
+    rewards: ["recycleEdge", "neonBackhand", "filterGuard", "dustStep", "cleanBreak"],
+    keywords: ["qingzhuo", "huifeng", "powang"],
+    stages: ["清洁工", "灵污外勤", "霓刃剑仙"],
   },
-  alchemist: {
-    id: "alchemist",
-    name: "异火丹师",
-    school: "焚鼎丹宗",
-    mark: "丹",
-    resourceName: "火候",
-    resourceKeyword: "yihuo",
-    trait: "慢热、炼化、续航。用异火灼烧敌人，再把火候炼成生机。",
-    maxHp: 62,
+  worker: {
+    id: "worker",
+    name: "社畜",
+    finalTitle: "兽相真君",
+    school: "天机城庶务楼",
+    mark: "兽",
+    avatar: "./src/assets/generated/unit-worker.png",
+    resourceName: "兽性",
+    resourceKeyword: "shouxing",
+    trait: "被工时、丹药和义体压到兽化。擅长承压、反打和狂化爆发。",
+    maxHp: 78,
     startQi: 0,
-    deck: ["emberNeedle", "emberNeedle", "cloudGuard", "cloudGuard", "fireTalisman", "fireTalisman", "breath", "inkStep"],
-    rewards: ["fireTalisman", "meridianPalm", "furnaceGuard", "ashMedicine", "emberNeedle"],
-    keywords: ["yihuo", "lianhua", "huti"],
-    stages: ["采药童子", "丹房弟子", "异火丹师"],
-    routes: [
-      { name: "丹道真人", alignment: "正路", text: "丹药、护体、回复更稳定，适合长线战斗。" },
-      { name: "毒火药师", alignment: "邪路", text: "异火与丹毒叠得更快，牺牲回复换压制。" },
-      { name: "九转炉主", alignment: "隐藏", text: "围绕九转火候构筑，爆发前需要精密铺垫。" },
-    ],
+    deck: ["overtimeClaw", "overtimeClaw", "overtimeClaw", "deadlineGuard", "deadlineGuard", "breath", "boneGrowth", "lastTrain"],
+    rewards: ["boneGrowth", "overtimeClaw", "deadlineGuard", "rageCommute", "beastShift"],
+    keywords: ["shouxing", "chengya", "kuanghua"],
+    stages: ["社畜", "兽化外勤", "兽相真君"],
   },
-  daoshi: {
-    id: "daoshi",
-    name: "玄箓天师",
-    school: "上清玄箓观",
-    mark: "箓",
-    resourceName: "雷印",
-    resourceKeyword: "leiyin",
-    trait: "符箓、雷法、镇妖。布下雷印与符镇，等敌人露出破绽后引雷。",
-    maxHp: 72,
+  streamer: {
+    id: "streamer",
+    name: "灵网主播",
+    finalTitle: "香火神女",
+    school: "万象直播台",
+    mark: "愿",
+    avatar: "./src/assets/generated/unit-streamer.png",
+    resourceName: "人气",
+    resourceKeyword: "renqi",
+    trait: "把弹幕、打赏和注目修成香火神通。擅长控场、护体和热度爆发。",
+    maxHp: 64,
     startQi: 0,
-    deck: ["talismanCut", "talismanCut", "cloudGuard", "cloudGuard", "thunderSeal", "stillWater", "breath", "meridianPalm"],
-    rewards: ["thunderSeal", "stillWater", "demonBinding", "cloudCall", "talismanCut"],
-    keywords: ["leiyin", "zhenyao", "huti"],
-    stages: ["道童", "箓生", "玄箓天师"],
-    routes: [
-      { name: "清微法师", alignment: "正路", text: "符镇与护体更强，善于拆解敌人意图。" },
-      { name: "役鬼道人", alignment: "邪路", text: "借阴煞役使妖鬼，换取更强的延迟伤害。" },
-      { name: "雷部敕使", alignment: "隐藏", text: "雷印达到极致，连锁落雷成为核心构筑。" },
-    ],
+    deck: ["goLive", "goLive", "goLive", "bulletGuard", "bulletGuard", "breath", "hotSearch", "spotlightStep"],
+    rewards: ["hotSearch", "bulletGuard", "fanMirror", "goLive", "crowdFocus"],
+    keywords: ["renqi", "danmu", "zhumu"],
+    stages: ["灵网主播", "香火网红", "香火神女"],
   },
 };
 
 export const CARD_LIBRARY = {
-  windSlash: {
-    id: "windSlash",
-    name: "斩风",
-    type: "attack",
-    kind: "剑诀",
-    cost: 1,
-    keywords: ["jianyi"],
-    text: "造成 7 点伤害。若有 3 点剑意，额外造成 3 点。",
-    play(game, target) {
-      const bonus = game.player.qi >= 3 ? 3 : 0;
-      dealDamage(game, target, 7 + bonus);
-      gainClassResource(game, 1);
-    },
-  },
-  swordSpark: {
-    id: "swordSpark",
-    name: "剑芒",
-    type: "attack",
-    kind: "剑诀",
-    cost: 1,
-    keywords: ["jianyi", "tongxuan"],
-    text: "造成 4 点伤害，获得 1 点剑意。",
-    play(game, target) {
-      dealDamage(game, target, 4);
-      gainClassResource(game, 1);
-    },
-  },
-  galeChain: {
-    id: "galeChain",
-    name: "连风式",
-    type: "attack",
-    kind: "剑诀",
-    cost: 1,
-    keywords: ["jianyi"],
-    text: "造成 5 点伤害。每有 2 点剑意，额外 +1 伤害。",
-    play(game, target) {
-      dealDamage(game, target, 5 + Math.floor(game.player.qi / 2));
-      gainClassResource(game, 1);
-    },
-  },
-  pierceStance: {
-    id: "pierceStance",
-    name: "破势",
-    type: "attack",
-    kind: "剑诀",
-    cost: 2,
-    keywords: ["poshi"],
-    text: "造成 12 点伤害。若敌人有护体，额外造成 5 点。",
-    play(game, target) {
-      dealDamage(game, target, 12 + (target.block > 0 ? 5 : 0));
-    },
-  },
-  emberNeedle: {
-    id: "emberNeedle",
-    name: "火针",
-    type: "attack",
-    kind: "丹火",
-    cost: 1,
-    keywords: ["yihuo"],
-    text: "造成 5 点伤害，附加 1 层异火。",
-    play(game, target) {
-      dealDamage(game, target, 5);
-      target.burn += 1;
-      gainClassResource(game, 1);
-    },
-  },
-  fireTalisman: {
-    id: "fireTalisman",
-    name: "离火符",
-    type: "attack",
-    kind: "丹火",
-    cost: 1,
-    keywords: ["yihuo"],
-    text: "造成 4 点伤害，附加 4 层异火。",
-    play(game, target) {
-      dealDamage(game, target, 4);
-      target.burn += 4;
-      gainClassResource(game, 1);
-      log(game, `${target.name} 身上燃起异火。`);
-    },
-  },
-  furnaceGuard: {
-    id: "furnaceGuard",
-    name: "炉火护身",
-    type: "skill",
-    kind: "丹法",
-    cost: 1,
-    keywords: ["huti", "lianhua"],
-    text: "获得 7 点护体。若敌人有异火，额外 +3 护体。",
-    play(game) {
-      gainBlock(game, 7 + (game.enemy.burn > 0 ? 3 : 0));
-    },
-  },
-  ashMedicine: {
-    id: "ashMedicine",
-    name: "灰烬丹",
-    type: "skill",
-    kind: "丹药",
-    cost: 1,
-    keywords: ["lianhua"],
-    text: "回复 4 点气血。若敌人有异火，抽 1 张牌。",
-    play(game) {
-      heal(game, 4);
-      if (game.enemy.burn > 0) drawCards(game, 1);
-    },
-  },
-  talismanCut: {
-    id: "talismanCut",
-    name: "符剑",
-    type: "attack",
-    kind: "符箓",
-    cost: 1,
-    keywords: ["leiyin"],
-    text: "造成 6 点伤害，获得 1 点雷印。",
-    play(game, target) {
-      dealDamage(game, target, 6);
-      gainClassResource(game, 1);
-    },
-  },
-  thunderSeal: {
-    id: "thunderSeal",
-    name: "惊雷印",
-    type: "attack",
-    kind: "法印",
-    cost: 2,
-    keywords: ["leiyin", "tongxuan"],
-    text: "造成 10 点伤害。若处于通玄，重复一次。",
-    play(game, target) {
-      const repeat = game.player.transcendent;
-      dealDamage(game, target, 10);
-      if (repeat) dealDamage(game, target, 10);
-      gainClassResource(game, 2);
-    },
-  },
-  demonBinding: {
-    id: "demonBinding",
-    name: "镇妖符",
-    type: "skill",
-    kind: "符箓",
-    cost: 1,
-    keywords: ["zhenyao", "huti"],
-    text: "获得 5 点护体，敌人攻势 -1。",
-    play(game) {
-      gainBlock(game, 5);
-      game.enemy.strength = Math.max(0, game.enemy.strength - 1);
-      log(game, `${game.enemy.name} 被符箓镇住，攻势下降。`);
-    },
-  },
-  cloudCall: {
-    id: "cloudCall",
-    name: "召云",
-    type: "skill",
-    kind: "雷法",
-    cost: 0,
-    keywords: ["leiyin"],
-    text: "获得 2 点雷印。",
-    play(game) {
-      gainClassResource(game, 2);
-    },
-  },
-  cloudGuard: {
-    id: "cloudGuard",
-    name: "云身",
-    type: "skill",
-    kind: "通用",
-    cost: 1,
-    keywords: ["huti"],
-    text: "获得 6 点护体。",
-    play(game) {
-      gainBlock(game, 6);
-    },
-  },
-  breath: {
-    id: "breath",
-    name: "吐纳",
-    type: "skill",
-    kind: "通用",
-    cost: 0,
-    keywords: ["lingli"],
-    text: "获得 2 点职业资源，抽 1 张牌。",
-    play(game) {
-      gainClassResource(game, 2);
-      drawCards(game, 1);
-    },
-  },
-  inkStep: {
-    id: "inkStep",
-    name: "墨影步",
-    type: "skill",
-    kind: "身法",
-    cost: 0,
-    keywords: ["huti"],
-    text: "获得 3 点护体。若职业资源为 0，改为获得 5 点护体。",
-    play(game) {
-      gainBlock(game, game.player.qi === 0 ? 5 : 3);
-    },
-  },
-  meridianPalm: {
-    id: "meridianPalm",
-    name: "归元掌",
-    type: "attack",
-    kind: "通用",
-    cost: 2,
-    keywords: ["lianhua"],
-    text: "造成 13 点伤害，消耗 2 点职业资源回复 3 点气血。",
-    play(game, target) {
-      dealDamage(game, target, 13);
-      if (spendClassResource(game, 2)) heal(game, 3);
-    },
-  },
-  stillWater: {
-    id: "stillWater",
-    name: "止水诀",
-    type: "skill",
-    kind: "通用",
-    cost: 1,
-    keywords: ["huti", "zhenyao"],
-    text: "获得 8 点护体。若没有手牌，获得 2 点职业资源。",
-    play(game) {
-      gainBlock(game, 8);
-      if (game.player.hand.length === 0) gainClassResource(game, 2);
-    },
-  },
+  sweepCut: card("sweepCut", "扫尘斩", "attack", "清洁刀", 1, ["qingzhuo"], "造成 7 点伤害，获得 1 点清浊。", (game, target) => {
+    dealDamage(game, target, 7);
+    gainClassResource(game, 1);
+  }),
+  recycleEdge: card("recycleEdge", "回收刃", "attack", "霓刃", 1, ["huifeng"], "造成 4 点伤害，抽 1 张牌。", (game, target) => {
+    dealDamage(game, target, 4);
+    drawCards(game, 1);
+  }),
+  neonBackhand: card("neonBackhand", "霓刃回锋", "attack", "剑势", 1, ["huifeng", "qingzhuo"], "造成 5 点伤害，获得 1 点清浊。", (game, target) => {
+    dealDamage(game, target, 5);
+    gainClassResource(game, 1);
+  }),
+  cleanBreak: card("cleanBreak", "破网清算", "attack", "清障", 2, ["powang"], "造成 13 点伤害。", (game, target) => {
+    dealDamage(game, target, 13);
+  }),
+  filterGuard: card("filterGuard", "滤阵护身", "skill", "护体", 1, ["huti"], "获得 7 点护体。", (game) => gainBlock(game, 7)),
+  dustStep: card("dustStep", "尘步", "skill", "身法", 0, ["huti"], "获得 3 点护体。", (game) => gainBlock(game, 3)),
+
+  overtimeClaw: card("overtimeClaw", "加班爪击", "attack", "兽化", 1, ["shouxing"], "造成 6 点伤害，获得 1 点兽性。", (game, target) => {
+    dealDamage(game, target, 6);
+    gainClassResource(game, 1);
+  }),
+  deadlineGuard: card("deadlineGuard", "死线硬撑", "skill", "承压", 1, ["chengya", "huti"], "获得 8 点护体。", (game) => gainBlock(game, 8)),
+  boneGrowth: card("boneGrowth", "兽骨增生", "skill", "异变", 1, ["shouxing", "huti"], "获得 5 点护体，获得 1 点兽性。", (game) => {
+    gainBlock(game, 5);
+    gainClassResource(game, 1);
+  }),
+  rageCommute: card("rageCommute", "通勤怒火", "attack", "狂化", 1, ["kuanghua"], "造成 5 点伤害，附加 2 层灼痕。", (game, target) => {
+    dealDamage(game, target, 5);
+    target.burn += 2;
+    log(game, `${target.name} 身上留下 2 层灼痕。`);
+  }),
+  beastShift: card("beastShift", "兽相显形", "attack", "终局", 2, ["shouxing"], "造成 12 点伤害，回复 3 点气血。", (game, target) => {
+    dealDamage(game, target, 12);
+    heal(game, 3);
+  }),
+  lastTrain: card("lastTrain", "末班奔袭", "skill", "身法", 0, ["shouxing"], "获得 2 点兽性。", (game) => gainClassResource(game, 2)),
+
+  goLive: card("goLive", "开播", "attack", "香火", 1, ["renqi"], "造成 5 点伤害，获得 1 点人气。", (game, target) => {
+    dealDamage(game, target, 5);
+    gainClassResource(game, 1);
+  }),
+  bulletGuard: card("bulletGuard", "弹幕护体", "skill", "弹幕", 1, ["danmu", "huti"], "获得 7 点护体。", (game) => gainBlock(game, 7)),
+  hotSearch: card("hotSearch", "热搜符", "attack", "注目", 1, ["zhumu"], "造成 4 点伤害，附加 3 层灼痕。", (game, target) => {
+    dealDamage(game, target, 4);
+    target.burn += 3;
+    log(game, `${target.name} 被推上热搜，留下 3 层灼痕。`);
+  }),
+  fanMirror: card("fanMirror", "粉丝镜阵", "skill", "香火", 1, ["renqi", "huti"], "获得 4 点护体，抽 1 张牌。", (game) => {
+    gainBlock(game, 4);
+    drawCards(game, 1);
+  }),
+  crowdFocus: card("crowdFocus", "万众注目", "attack", "终局", 2, ["zhumu", "renqi"], "造成 10 点伤害，获得 2 点人气。", (game, target) => {
+    dealDamage(game, target, 10);
+    gainClassResource(game, 2);
+  }),
+  spotlightStep: card("spotlightStep", "镜头位移", "skill", "身法", 0, ["huti"], "获得 3 点护体。", (game) => gainBlock(game, 3)),
+
+  breath: card("breath", "调息", "skill", "通用", 0, ["lingli"], "获得 2 点职业资源，抽 1 张牌。", (game) => {
+    gainClassResource(game, 2);
+    drawCards(game, 1);
+  }),
 };
 
 const ENCOUNTERS = [
   {
-    id: "wolf",
-    name: "灰背小狼",
-    title: "林间幼兽",
-    art: "./src/assets/enemy-wolf.svg",
-    maxHp: 30,
+    id: "neonHound",
+    name: "霓灯犬",
+    title: "巷口灵污兽",
+    art: "./src/assets/generated/unit-neon-hound.png",
+    maxHp: 32,
     moves: [
       { intent: "attack", amount: 6, label: "撕咬" },
-      { intent: "attack", amount: 5, label: "连扑" },
-      { intent: "buff", amount: 2, label: "嗥叫" },
+      { intent: "attack", amount: 5, label: "追光扑" },
+      { intent: "buff", amount: 2, label: "嗅血" },
     ],
   },
   {
-    id: "boar",
-    name: "裂牙野猪",
-    title: "山道蛮兽",
-    art: "./src/assets/enemy-boar.svg",
-    maxHp: 44,
+    id: "ironBoar",
+    name: "铁鬃械猪",
+    title: "废矿改造妖兽",
+    art: "./src/assets/generated/unit-iron-boar.png",
+    maxHp: 46,
     moves: [
-      { intent: "block", amount: 8, label: "拱地" },
+      { intent: "block", amount: 8, label: "铁鬃蓄能" },
       { intent: "attack", amount: 13, label: "冲撞" },
-      { intent: "attack", amount: 8, label: "獠牙" },
+      { intent: "attack", amount: 8, label: "断轨獠牙" },
     ],
   },
   {
-    id: "bandit",
-    name: "黑巾强盗",
-    title: "劫道刀客",
-    art: "./src/assets/enemy-bandit.svg",
-    maxHp: 52,
+    id: "alleyRaider",
+    name: "黑巷劫修",
+    title: "非法法诀芯片贩",
+    art: "./src/assets/generated/unit-alley-raider.png",
+    maxHp: 54,
     moves: [
-      { intent: "attack", amount: 8, label: "劈砍" },
-      { intent: "block", amount: 7, label: "架刀" },
-      { intent: "buff", amount: 3, label: "叫阵" },
-      { intent: "attack", amount: 12, label: "横斩" },
+      { intent: "attack", amount: 8, label: "劫刃" },
+      { intent: "block", amount: 7, label: "黑市护符" },
+      { intent: "buff", amount: 3, label: "嗑药提频" },
+      { intent: "attack", amount: 12, label: "断脉斩" },
     ],
   },
 ];
 
+function card(id, name, type, kind, cost, keywords, text, play) {
+  return { id, name, type, kind, cost, keywords, text, play };
+}
+
 export function createGame() {
   return {
     screen: "start",
+    previousScreen: "start",
     floor: 1,
-    act: 1,
     rewardChoices: [],
     player: null,
     enemy: null,
     turn: 0,
-    log: ["山门外风声渐起。"],
+    log: ["天机城雨夜开档。"],
     rngSeed: Date.now() % 2147483647,
   };
+}
+
+export function restartGame() {
+  return createGame();
 }
 
 export function showCodex(game) {
@@ -395,11 +209,12 @@ export function closeCodex(game) {
 export function chooseCultivator(game, cultivatorId) {
   const cultivator = CULTIVATORS[cultivatorId];
   game.floor = 1;
-  game.act = 1;
   game.player = {
     cultivator: cultivator.id,
     name: cultivator.name,
+    finalTitle: cultivator.finalTitle,
     school: cultivator.school,
+    avatar: cultivator.avatar,
     resourceName: cultivator.resourceName,
     maxHp: cultivator.maxHp,
     hp: cultivator.maxHp,
@@ -415,7 +230,7 @@ export function chooseCultivator(game, cultivatorId) {
     discardPile: [],
     hand: [],
   };
-  game.log = [`${cultivator.name} 入山问道。`];
+  game.log = [`${cultivator.name} 接入夜巡频道。`];
   startCombat(game);
 }
 
@@ -423,7 +238,6 @@ export function startCombat(game) {
   const encounter = ENCOUNTERS[(game.floor - 1) % ENCOUNTERS.length];
   game.enemy = {
     ...encounter,
-    maxHp: encounter.maxHp,
     hp: encounter.maxHp,
     block: 0,
     strength: 0,
@@ -463,7 +277,7 @@ export function endTurn(game) {
   if (game.screen !== "combat") return;
   if (game.player.energy > 0) {
     gainClassResource(game, game.player.energy);
-    log(game, `余下灵力化为 ${game.player.energy} 点${game.player.resourceName}。`);
+    log(game, `余下灵能化为 ${game.player.energy} 点${game.player.resourceName}。`);
   }
   discardHand(game);
   resolveEnemyTurn(game);
@@ -489,10 +303,6 @@ export function skipReward(game) {
   if (game.screen !== "reward") return;
   game.floor += 1;
   startCombat(game);
-}
-
-export function restartGame() {
-  return createGame();
 }
 
 function startPlayerTurn(game) {
@@ -526,13 +336,13 @@ function winCombat(game) {
   if (game.floor >= ACT_LENGTH) {
     game.screen = "complete";
     game.rewardChoices = [];
-    log(game, "山脚试炼完成。");
+    log(game, "第一段夜巡完成。");
     return;
   }
 
   game.screen = "reward";
   game.rewardChoices = pickRewards(game, 3);
-  log(game, "留下一缕机缘。");
+  log(game, "截获一枚法诀芯片。");
 }
 
 function chooseEnemyMove(game) {
@@ -581,16 +391,10 @@ function gainClassResource(game, amount) {
   }
 }
 
-function spendClassResource(game, amount) {
-  if (game.player.qi < amount) return false;
-  game.player.qi -= amount;
-  return true;
-}
-
 function applyBurn(game, target) {
   if (target.burn <= 0) return;
   target.hp -= target.burn;
-  log(game, `${target.name} 异火发作，受 ${target.burn} 点伤害。`);
+  log(game, `${target.name} 灼痕发作，受 ${target.burn} 点伤害。`);
   target.burn = Math.max(0, target.burn - 1);
   if (target.hp <= 0) winCombat(game);
 }

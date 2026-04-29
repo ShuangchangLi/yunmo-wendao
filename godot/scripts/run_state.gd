@@ -7,6 +7,7 @@ var cards: Dictionary
 var enemies: Array
 
 var floor := 1
+var turn := 0
 var selected_class := ""
 var player := {}
 var enemy := {}
@@ -25,9 +26,13 @@ func start_new(class_id: String) -> void:
 	var cls: Dictionary = classes[class_id]
 	floor = 1
 	player = {
+		"id": class_id,
 		"name": cls["name"],
+		"final_title": cls.get("final_title", ""),
 		"school": cls["school"],
 		"resource_name": cls["resource_name"],
+		"visual": cls.get("visual", class_id),
+		"mark": cls.get("mark", ""),
 		"hp": cls["max_hp"],
 		"max_hp": cls["max_hp"],
 		"block": 0,
@@ -38,7 +43,7 @@ func start_new(class_id: String) -> void:
 		"transcendent": false,
 		"deck": cls["deck"].duplicate()
 	}
-	log = ["%s 入山问道。" % cls["name"]]
+	log = ["%s 进入天机城夜巡。" % cls["name"]]
 	_start_combat()
 
 func _start_combat() -> void:
@@ -50,6 +55,7 @@ func _start_combat() -> void:
 	enemy["burn"] = 0
 	enemy["move_index"] = 0
 	enemy["next_move"] = enemy["moves"][0]
+	turn = 0
 	draw_pile = player["deck"].duplicate()
 	draw_pile.shuffle()
 	discard_pile = []
@@ -60,6 +66,7 @@ func _start_combat() -> void:
 	_add_log("第 %d 战：%s 拦路。" % [floor, enemy["name"]])
 
 func _start_player_turn() -> void:
+	turn += 1
 	player["block"] = 0
 	player["energy"] = player["max_energy"]
 	_draw_cards(5)
@@ -83,7 +90,7 @@ func play_card(hand_index: int) -> void:
 func end_turn() -> void:
 	if player["energy"] > 0:
 		_gain_resource(player["energy"])
-		_add_log("余下灵力化为 %d 点%s。" % [player["energy"], player["resource_name"]])
+		_add_log("余下灵能化为 %d 点%s。" % [player["energy"], player["resource_name"]])
 	discard_pile.append_array(hand)
 	hand = []
 	_resolve_enemy_turn()
@@ -105,7 +112,7 @@ func skip_reward() -> void:
 func reward_choices() -> Array:
 	var pool: Array = classes[selected_class]["rewards"].duplicate()
 	pool.shuffle()
-	return pool.slice(0, 3)
+	return pool.slice(0, min(3, pool.size()))
 
 func is_complete() -> bool:
 	return floor >= ACT_LENGTH and enemy["hp"] <= 0
@@ -119,10 +126,13 @@ func _apply_card(card: Dictionary) -> void:
 		_gain_resource(int(card["resource"]))
 	if card.has("burn"):
 		enemy["burn"] += int(card["burn"])
+		_add_log("%s 身上留下 %d 层灼痕。" % [enemy["name"], card["burn"]])
 	if card.has("draw"):
 		_draw_cards(int(card["draw"]))
 	if card.has("heal"):
-		player["hp"] = min(player["max_hp"], player["hp"] + int(card["heal"]))
+		var amount := int(card["heal"])
+		player["hp"] = min(player["max_hp"], player["hp"] + amount)
+		_add_log("气血回复 %d。" % amount)
 
 func _deal_damage(amount: int) -> void:
 	if player["transcendent"]:
@@ -171,7 +181,7 @@ func _apply_burn() -> void:
 	if enemy.get("burn", 0) <= 0:
 		return
 	enemy["hp"] -= enemy["burn"]
-	_add_log("%s 异火发作，受 %d 点伤害。" % [enemy["name"], enemy["burn"]])
+	_add_log("%s 灼痕发作，受 %d 点伤害。" % [enemy["name"], enemy["burn"]])
 	enemy["burn"] = max(0, enemy["burn"] - 1)
 	if enemy["hp"] <= 0:
 		_win_combat()
@@ -180,7 +190,7 @@ func _win_combat() -> void:
 	enemy["hp"] = 0
 	_add_log("%s 败退。" % enemy["name"])
 	if floor >= ACT_LENGTH:
-		_add_log("山脚试炼完成。")
+		_add_log("第一段夜巡完成。")
 
 func _draw_cards(count: int) -> void:
 	for i in range(count):

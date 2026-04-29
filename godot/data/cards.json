@@ -1,141 +1,166 @@
 {
-  "wind_slash": {
-    "name": "斩风",
-    "kind": "剑诀",
+  "sweep_cut": {
+    "name": "扫尘斩",
+    "kind": "清洁刀",
     "cost": 1,
-    "text": "造成 7 点伤害，获得 1 点剑意。",
+    "text": "造成 7 点伤害，获得 1 点清浊。",
     "damage": 7,
     "resource": 1,
-    "keywords": ["jianyi"]
+    "keywords": ["qingzhuo"]
   },
-  "sword_spark": {
-    "name": "剑芒",
-    "kind": "剑诀",
+  "recycle_edge": {
+    "name": "回收刃",
+    "kind": "霓刃",
     "cost": 1,
-    "text": "造成 4 点伤害，获得 1 点剑意。",
+    "text": "造成 4 点伤害，抽 1 张牌。",
     "damage": 4,
-    "resource": 1,
-    "keywords": ["jianyi"]
+    "draw": 1,
+    "keywords": ["huifeng"]
   },
-  "gale_chain": {
-    "name": "连风式",
-    "kind": "剑诀",
+  "neon_backhand": {
+    "name": "霓刃回锋",
+    "kind": "剑势",
     "cost": 1,
-    "text": "造成 5 点伤害，获得 1 点剑意。",
+    "text": "造成 5 点伤害，获得 1 点清浊。",
     "damage": 5,
     "resource": 1,
-    "keywords": ["jianyi"]
+    "keywords": ["huifeng", "qingzhuo"]
   },
-  "pierce_stance": {
-    "name": "破势",
-    "kind": "剑诀",
+  "clean_break": {
+    "name": "破网清算",
+    "kind": "清障",
     "cost": 2,
-    "text": "造成 12 点伤害。",
-    "damage": 12,
-    "keywords": ["jianyi"]
+    "text": "造成 13 点伤害。",
+    "damage": 13,
+    "keywords": ["powang"]
   },
-  "ember_needle": {
-    "name": "火针",
-    "kind": "丹火",
+  "filter_guard": {
+    "name": "滤阵护身",
+    "kind": "护体",
     "cost": 1,
-    "text": "造成 5 点伤害，附加 1 层异火。",
-    "damage": 5,
-    "burn": 1,
-    "resource": 1,
-    "keywords": ["yihuo"]
-  },
-  "fire_talisman": {
-    "name": "离火符",
-    "kind": "丹火",
-    "cost": 1,
-    "text": "造成 4 点伤害，附加 4 层异火。",
-    "damage": 4,
-    "burn": 4,
-    "resource": 1,
-    "keywords": ["yihuo"]
-  },
-  "furnace_guard": {
-    "name": "炉火护身",
-    "kind": "丹法",
-    "cost": 1,
-    "text": "获得 8 点护体。",
-    "block": 8,
+    "text": "获得 7 点护体。",
+    "block": 7,
     "keywords": ["huti"]
   },
-  "ash_medicine": {
-    "name": "灰烬丹",
-    "kind": "丹药",
-    "cost": 1,
-    "text": "回复 4 点气血，抽 1 张牌。",
-    "heal": 4,
-    "draw": 1,
-    "keywords": ["yihuo"]
-  },
-  "talisman_cut": {
-    "name": "符剑",
-    "kind": "符箓",
-    "cost": 1,
-    "text": "造成 6 点伤害，获得 1 点雷印。",
-    "damage": 6,
-    "resource": 1,
-    "keywords": ["leiyin"]
-  },
-  "thunder_seal": {
-    "name": "惊雷印",
-    "kind": "法印",
-    "cost": 2,
-    "text": "造成 10 点伤害，获得 2 点雷印。",
-    "damage": 10,
-    "resource": 2,
-    "keywords": ["leiyin"]
-  },
-  "demon_binding": {
-    "name": "镇妖符",
-    "kind": "符箓",
-    "cost": 1,
-    "text": "获得 5 点护体。",
-    "block": 5,
-    "keywords": ["huti"]
-  },
-  "cloud_call": {
-    "name": "召云",
-    "kind": "雷法",
-    "cost": 0,
-    "text": "获得 2 点雷印。",
-    "resource": 2,
-    "keywords": ["leiyin"]
-  },
-  "cloud_guard": {
-    "name": "云身",
-    "kind": "通用",
-    "cost": 1,
-    "text": "获得 6 点护体。",
-    "block": 6,
-    "keywords": ["huti"]
-  },
-  "breath": {
-    "name": "吐纳",
-    "kind": "通用",
-    "cost": 0,
-    "text": "获得 2 点职业资源，抽 1 张牌。",
-    "resource": 2,
-    "draw": 1,
-    "keywords": ["lingli"]
-  },
-  "ink_step": {
-    "name": "墨影步",
+  "dust_step": {
+    "name": "尘步",
     "kind": "身法",
     "cost": 0,
     "text": "获得 3 点护体。",
     "block": 3,
     "keywords": ["huti"]
   },
-  "still_water": {
-    "name": "止水诀",
-    "kind": "通用",
+  "overtime_claw": {
+    "name": "加班爪击",
+    "kind": "兽化",
+    "cost": 1,
+    "text": "造成 6 点伤害，获得 1 点兽性。",
+    "damage": 6,
+    "resource": 1,
+    "keywords": ["shouxing"]
+  },
+  "deadline_guard": {
+    "name": "死线硬撑",
+    "kind": "承压",
     "cost": 1,
     "text": "获得 8 点护体。",
     "block": 8,
+    "keywords": ["chengya", "huti"]
+  },
+  "bone_growth": {
+    "name": "兽骨增生",
+    "kind": "异变",
+    "cost": 1,
+    "text": "获得 5 点护体，获得 1 点兽性。",
+    "block": 5,
+    "resource": 1,
+    "keywords": ["shouxing", "huti"]
+  },
+  "rage_commute": {
+    "name": "通勤怒火",
+    "kind": "狂化",
+    "cost": 1,
+    "text": "造成 5 点伤害，附加 2 层灼痕。",
+    "damage": 5,
+    "burn": 2,
+    "keywords": ["kuanghua"]
+  },
+  "beast_shift": {
+    "name": "兽相显形",
+    "kind": "终局",
+    "cost": 2,
+    "text": "造成 12 点伤害，回复 3 点气血。",
+    "damage": 12,
+    "heal": 3,
+    "keywords": ["shouxing"]
+  },
+  "last_train": {
+    "name": "末班奔袭",
+    "kind": "身法",
+    "cost": 0,
+    "text": "获得 2 点兽性。",
+    "resource": 2,
+    "keywords": ["shouxing"]
+  },
+  "go_live": {
+    "name": "开播",
+    "kind": "香火",
+    "cost": 1,
+    "text": "造成 5 点伤害，获得 1 点人气。",
+    "damage": 5,
+    "resource": 1,
+    "keywords": ["renqi"]
+  },
+  "bullet_guard": {
+    "name": "弹幕护体",
+    "kind": "弹幕",
+    "cost": 1,
+    "text": "获得 7 点护体。",
+    "block": 7,
+    "keywords": ["danmu", "huti"]
+  },
+  "hot_search": {
+    "name": "热搜符",
+    "kind": "注目",
+    "cost": 1,
+    "text": "造成 4 点伤害，附加 3 层灼痕。",
+    "damage": 4,
+    "burn": 3,
+    "keywords": ["zhumu"]
+  },
+  "fan_mirror": {
+    "name": "粉丝镜阵",
+    "kind": "香火",
+    "cost": 1,
+    "text": "获得 4 点护体，抽 1 张牌。",
+    "block": 4,
+    "draw": 1,
+    "keywords": ["renqi", "huti"]
+  },
+  "crowd_focus": {
+    "name": "万众注目",
+    "kind": "终局",
+    "cost": 2,
+    "text": "造成 10 点伤害，获得 2 点人气。",
+    "damage": 10,
+    "resource": 2,
+    "keywords": ["zhumu", "renqi"]
+  },
+  "spotlight_step": {
+    "name": "镜头位移",
+    "kind": "身法",
+    "cost": 0,
+    "text": "获得 3 点护体。",
+    "block": 3,
     "keywords": ["huti"]
+  },
+  "breath": {
+    "name": "调息",
+    "kind": "通用",
+    "cost": 0,
+    "text": "获得 2 点职业资源，抽 1 张牌。",
+    "resource": 2,
+    "draw": 1,
+    "keywords": ["lingli"]
   }
 }
