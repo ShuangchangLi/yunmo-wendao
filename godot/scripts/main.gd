@@ -45,16 +45,23 @@ func _make_screen() -> VBoxContainer:
 	margin.add_theme_constant_override("margin_bottom", 24)
 	add_child(margin)
 
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	margin.add_child(scroll)
+
 	var root := VBoxContainer.new()
+	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_theme_constant_override("separation", 16)
-	margin.add_child(root)
+	scroll.add_child(root)
 	return root
 
 func _show_main_menu() -> void:
 	var root := _make_screen()
 
 	var hero := PanelContainer.new()
-	hero.custom_minimum_size = Vector2(0, 270)
+	hero.custom_minimum_size = Vector2(0, 220)
 	hero.add_theme_stylebox_override("panel", _panel_style(Color(0.02, 0.025, 0.07, 0.78), Color("#36f5ff"), 10))
 	root.add_child(hero)
 
@@ -85,7 +92,7 @@ func _show_main_menu() -> void:
 	codex.pressed.connect(_show_codex)
 	action_row.add_child(codex)
 
-	hero_box.add_child(_unit_art("streamer", Vector2(280, 230)))
+	hero_box.add_child(_unit_art("streamer", Vector2(240, 190)))
 
 	var choose := _label("选择入城身份", 24, Color("#ffe66d"))
 	root.add_child(choose)
@@ -102,14 +109,14 @@ func _show_main_menu() -> void:
 func _class_card(class_id: String, class_data: Dictionary) -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.custom_minimum_size = Vector2(320, 390)
+	panel.custom_minimum_size = Vector2(300, 330)
 	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.025, 0.028, 0.075, 0.86), _class_color(class_id), 10))
 
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 10)
 	panel.add_child(box)
 
-	var portrait := _unit_art(class_data.get("visual", class_id), Vector2(0, 178))
+	var portrait := _unit_art(class_data.get("visual", class_id), Vector2(0, 128))
 	box.add_child(portrait)
 
 	var name := _label("%s -> %s" % [class_data["name"], class_data["final_title"]], 25, Color("#f7fbff"))
@@ -346,19 +353,34 @@ func _card_button(card_id: String, hand_index: int, playable: bool) -> Button:
 	return button
 
 func _unit_art(visual: String, min_size: Vector2) -> Control:
-	var path := _unit_art_path(visual)
-	var image := Image.new()
-	var err := image.load(path)
-	if err != OK:
+	var strip_path := _unit_idle_strip_path(visual)
+	var portrait_path := _unit_art_path(visual)
+	var strip_image := _load_image(strip_path)
+	var portrait_image := _load_image(portrait_path)
+	if strip_image == null and portrait_image == null:
 		var fallback := CyberPortrait.new()
 		fallback.custom_minimum_size = min_size
 		fallback.configure(visual, "")
 		return fallback
-	var texture := ImageTexture.create_from_image(image)
 	var art := UnitArt.new()
 	art.custom_minimum_size = min_size
-	art.texture = texture
+	if strip_image != null:
+		art.set_strip(strip_image)
+	elif portrait_image != null:
+		art.set_static_texture(ImageTexture.create_from_image(portrait_image))
 	return art
+
+func _load_image(path: String) -> Image:
+	if path.is_empty():
+		return null
+	var bytes := FileAccess.get_file_as_bytes(path)
+	if bytes.is_empty():
+		return null
+	var image := Image.new()
+	var err := image.load_png_from_buffer(bytes)
+	if err != OK:
+		return null
+	return image
 
 func _hover_card(button: Button, active: bool) -> void:
 	button.z_index = 10 if active else 0
@@ -529,14 +551,25 @@ func _class_color(class_id: String) -> Color:
 
 func _unit_art_path(visual: String) -> String:
 	var paths := {
-		"cleaner": "res://assets/generated/unit-cleaner.png",
-		"worker": "res://assets/generated/unit-worker.png",
-		"streamer": "res://assets/generated/unit-streamer.png",
-		"neon_hound": "res://assets/generated/unit-neon-hound.png",
-		"iron_boar": "res://assets/generated/unit-iron-boar.png",
-		"alley_raider": "res://assets/generated/unit-alley-raider.png"
+		"cleaner": "res://assets/pixel/px-cleaner.png",
+		"worker": "res://assets/pixel/px-worker.png",
+		"streamer": "res://assets/pixel/px-streamer.png",
+		"neon_hound": "res://assets/pixel/px-enemy-neon-hound.png",
+		"iron_boar": "res://assets/pixel/px-enemy-iron-boar.png",
+		"alley_raider": "res://assets/pixel/px-enemy-alley-raider.png"
 	}
-	return paths.get(visual, "res://assets/generated/unit-cleaner.png")
+	return paths.get(visual, "res://assets/pixel/px-cleaner.png")
+
+func _unit_idle_strip_path(visual: String) -> String:
+	var paths := {
+		"cleaner": "res://assets/pixel/px-cleaner-idle-strip.png",
+		"worker": "res://assets/pixel/px-worker-idle-strip.png",
+		"streamer": "res://assets/pixel/px-streamer-idle-strip.png",
+		"neon_hound": "res://assets/pixel/px-enemy-neon-hound-idle-strip.png",
+		"iron_boar": "res://assets/pixel/px-enemy-iron-boar-idle-strip.png",
+		"alley_raider": "res://assets/pixel/px-enemy-alley-raider-idle-strip.png"
+	}
+	return paths.get(visual, "")
 
 func _intent_color(intent: String) -> Color:
 	if intent == "attack":

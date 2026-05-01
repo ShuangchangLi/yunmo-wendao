@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Starter streamer">
+  <defs>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="rough"><feTurbulence baseFrequency=".018" numOctaves="2" seed="19"/><feDisplacementMap in="SourceGraphic" scale="1.2"/></filter>
+  </defs>
+  <rect width="512" height="512" rx="26" fill="#080917"/>
+  <path d="M94 424 C178 454 326 454 417 423" fill="none" stroke="#211827" stroke-width="16" opacity=".7"/>
+  <g filter="url(#rough)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M208 149 C214 113 250 96 286 112 C315 125 322 164 298 189 C270 218 217 201 208 149Z" fill="#e1c0ae" stroke="#17121b" stroke-width="8"/>
+    <path d="M188 125 C224 78 294 82 320 128 C286 108 226 107 188 125Z" fill="#171320" stroke="#30243a" stroke-width="8"/>
+    <path d="M184 204 C225 182 288 184 326 205 L348 366 C302 396 209 396 165 366Z" fill="#1b1827" stroke="#14101a" stroke-width="9"/>
+    <path d="M196 211 L166 326 M315 211 L351 326" fill="none" stroke="#e8dfed" stroke-width="28"/>
+    <path d="M172 326 C164 354 183 371 211 357 M350 324 C365 348 358 370 329 365" fill="none" stroke="#e1c0ae" stroke-width="15"/>
+    <path d="M206 366 L195 452 M302 366 L319 452" fill="none" stroke="#161522" stroke-width="28"/>
+    <path d="M188 455 C213 468 238 467 251 452 M300 452 C318 470 352 468 371 454" fill="none" stroke="#0d1119" stroke-width="13"/>
+    <path d="M120 236 L162 229 L169 300 L126 307Z" fill="#101827" stroke="#ff71d7" stroke-width="5"/>
+    <path d="M117 220 L170 210" stroke="#ffd86a" stroke-width="5"/>
+  </g>
+  <g filter="url(#glow)">
+    <path d="M332 118 C356 136 361 170 345 197" fill="none" stroke="#ff71d7" stroke-width="6" opacity=".52"/>
+    <path d="M174 118 C149 138 145 170 162 198" fill="none" stroke="#52f0ff" stroke-width="6" opacity=".44"/>
+    <rect x="362" y="128" width="38" height="68" rx="8" fill="#111827" stroke="#52f0ff" stroke-width="4"/>
+    <path d="M382 196 L382 260" stroke="#52f0ff" stroke-width="5"/>
+    <path d="M62 132 H128 M386 272 H448 M65 330 H116" stroke="#ff71d7" stroke-width="6" stroke-linecap="round" opacity=".42"/>
+  </g>
+</svg>

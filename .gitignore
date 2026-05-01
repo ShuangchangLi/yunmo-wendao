@@ -8,3 +8,5 @@ server.err.log
 npm-debug.log*
 godot/.godot/
 godot/export_presets.cfg
+tmp/
+godot/assets/style-reference/

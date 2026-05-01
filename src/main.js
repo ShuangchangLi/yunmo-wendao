@@ -16,14 +16,44 @@ import {
 } from "./game.js";
 
 const SAVE_KEY = "nixu-wendao-save";
+const SPRITE_FRAME_MS = 160;
 
 let game = createGame();
 let logOpen = false;
+let spriteTimers = [];
 const app = document.querySelector("#app");
 
 function render() {
   app.innerHTML = renderScreen();
   bindEvents();
+  bindSprites();
+}
+
+function bindSprites() {
+  spriteTimers.forEach(clearInterval);
+  spriteTimers = [];
+  app.querySelectorAll("[data-strip]").forEach((el) => {
+    const strip = el.dataset.strip;
+    const frames = Math.max(1, Number(el.dataset.frames) || 1);
+    if (!strip) return;
+    el.style.backgroundImage = `url("${strip}")`;
+    el.style.backgroundRepeat = "no-repeat";
+    el.style.backgroundSize = `${frames * 100}% 100%`;
+    el.style.backgroundPosition = "0% 0%";
+    if (frames <= 1) return;
+    let i = 0;
+    const advance = () => {
+      i = (i + 1) % frames;
+      el.style.backgroundPosition = `${(i / (frames - 1)) * 100}% 0%`;
+    };
+    spriteTimers.push(setInterval(advance, SPRITE_FRAME_MS));
+  });
+}
+
+function spriteAttrs(strip, frames, fallback) {
+  const useStrip = strip || fallback;
+  const count = strip ? Math.max(1, Number(frames) || 1) : 1;
+  return ` data-strip="${useStrip}" data-frames="${count}"`;
 }
 
 function renderScreen() {
@@ -62,7 +92,7 @@ function renderStart() {
 function renderCultivator(cultivator) {
   return `
     <button class="cultivator-card cyber-card ${cultivator.id}" data-action="choose-cultivator" data-cultivator="${cultivator.id}">
-      <img class="role-art" src="${cultivator.avatar}" alt="" />
+      <div class="role-art role-art-anim"${spriteAttrs(cultivator.idleStrip, cultivator.idleFrames, cultivator.avatar)}></div>
       <span class="role-mark">${cultivator.mark}</span>
       <strong>${cultivator.name} <em>-> ${cultivator.finalTitle}</em></strong>
       <small>${cultivator.school}</small>
@@ -123,7 +153,7 @@ function renderCombatant(side) {
       <div class="unit-top ${isEnemy ? "" : "player-top"}">
         ${isEnemy ? enemyIntent() : playerFocus()}
         <div class="portrait-frame">
-          <img class="enemy-art role-art-large" src="${isEnemy ? unit.art : unit.avatar}" alt="${unit.name}" />
+          <div class="enemy-art role-art-anim role-art-large"${spriteAttrs(unit.idleStrip, unit.idleFrames, isEnemy ? unit.art : unit.avatar)} aria-label="${unit.name}"></div>
         </div>
       </div>
       <div class="combatant-title">
@@ -258,7 +288,7 @@ function renderCodex() {
 function renderRouteCard(cultivator) {
   return `
     <article class="route-card">
-      <img class="route-art" src="${cultivator.avatar}" alt="" />
+      <div class="route-art role-art-anim"${spriteAttrs(cultivator.idleStrip, cultivator.idleFrames, cultivator.avatar)}></div>
       <span class="role-mark small">${cultivator.mark}</span>
       <h3>${cultivator.name} -> ${cultivator.finalTitle}</h3>
       <p>${cultivator.trait}</p>
@@ -275,6 +305,7 @@ function cardButton(cardId, mode, index = 0) {
     <button class="card ${card.type}" data-action="${action}" data-card="${cardId}" data-index="${index}" ${disabled}>
       <span class="cost">${card.cost}</span>
       <span class="kind">${card.kind}</span>
+      <img class="card-art" src="${cardIcon(card)}" alt="" />
       <strong>${card.name}</strong>
       <p>${card.text}</p>
       <div class="keyword-row">${card.keywords.map(keywordChip).join("")}</div>
@@ -285,6 +316,19 @@ function cardButton(cardId, mode, index = 0) {
 
 function keywordChip(id) {
   return `<span class="keyword-chip">${KEYWORDS[id]?.name || id}</span>`;
+}
+
+function cardIcon(card) {
+  if (card.keywords.includes("qingzhuo") || card.keywords.includes("huifeng") || card.keywords.includes("powang")) {
+    return card.type === "attack" ? "./src/assets/pixel/card-cleaner-attack.png" : "./src/assets/pixel/card-cleaner-skill.png";
+  }
+  if (card.keywords.includes("shouxing") || card.keywords.includes("chengya") || card.keywords.includes("kuanghua")) {
+    return card.type === "attack" ? "./src/assets/pixel/card-worker-attack.png" : "./src/assets/pixel/card-worker-skill.png";
+  }
+  if (card.keywords.includes("renqi") || card.keywords.includes("danmu") || card.keywords.includes("zhumu")) {
+    return card.type === "attack" ? "./src/assets/pixel/card-streamer-attack.png" : "./src/assets/pixel/card-streamer-skill.png";
+  }
+  return "./src/assets/pixel/card-breath.png";
 }
 
 function keywordPopover(ids) {
