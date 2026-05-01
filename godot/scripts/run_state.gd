@@ -5,10 +5,12 @@ const ACT_LENGTH := 3
 var classes: Dictionary
 var cards: Dictionary
 var enemies: Array
+var organizations: Dictionary
 
 var floor := 1
 var turn := 0
 var selected_class := ""
+var selected_org := ""
 var player := {}
 var enemy := {}
 var draw_pile: Array = []
@@ -16,38 +18,42 @@ var discard_pile: Array = []
 var hand: Array = []
 var log: Array[String] = []
 
-func setup(data_classes: Dictionary, data_cards: Dictionary, data_enemies: Array) -> void:
+func setup(data_classes: Dictionary, data_cards: Dictionary, data_enemies: Array, data_orgs: Dictionary) -> void:
 	classes = data_classes
 	cards = data_cards
 	enemies = data_enemies
+	organizations = data_orgs
 
-func start_new(class_id: String) -> void:
+func start_new(class_id: String, org_id: String) -> void:
 	selected_class = class_id
+	selected_org = org_id
 	var cls: Dictionary = classes[class_id]
+	var org: Dictionary = organizations[org_id]
 	floor = 1
 	player = {
 		"id": class_id,
 		"name": cls["name"],
-		"final_title": cls.get("final_title", ""),
-		"school": cls["school"],
-		"resource_name": cls["resource_name"],
+		"profession": cls["profession"],
+		"tagline": cls.get("tagline", ""),
 		"visual": cls.get("visual", class_id),
-		"mark": cls.get("mark", ""),
+		"organization_id": org_id,
+		"organization_name": org["name"],
+		"organization_color": org["color"],
 		"hp": cls["max_hp"],
 		"max_hp": cls["max_hp"],
 		"block": 0,
 		"energy": 3,
 		"max_energy": 3,
-		"resource": cls["start_resource"],
-		"max_resource": 6,
-		"transcendent": false,
-		"deck": cls["deck"].duplicate()
+		"passive": cls["passive"],
+		"deck": cls["deck"].duplicate(),
+		"attacks_played": 0,
+		"deathline_triggers": 0,
 	}
-	log = ["%s 进入天机城夜巡。" % cls["name"]]
+	log = ["%s（%s）进入夜巡，挂靠 %s。" % [cls["name"], cls["profession"], org["name"]]]
 	_start_combat()
 
 func _start_combat() -> void:
-	var encounter: Dictionary = enemies[floor - 1]
+	var encounter: Dictionary = enemies[(floor - 1) % enemies.size()]
 	enemy = encounter.duplicate(true)
 	enemy["hp"] = enemy["max_hp"]
 	enemy["block"] = 0
@@ -62,6 +68,9 @@ func _start_combat() -> void:
 	hand = []
 	player["block"] = 0
 	player["energy"] = player["max_energy"]
+	player["attacks_played"] = 0
+	player["deathline_triggers"] = 0
+	_choose_enemy_move()
 	_start_player_turn()
 	_add_log("第 %d 战：%s 拦路。" % [floor, enemy["name"]])
 
@@ -69,6 +78,7 @@ func _start_player_turn() -> void:
 	turn += 1
 	player["block"] = 0
 	player["energy"] = player["max_energy"]
+	player["deathline_triggers"] = 0
 	_draw_cards(5)
 	_apply_burn()
 
@@ -88,14 +98,15 @@ func play_card(hand_index: int) -> void:
 		_win_combat()
 
 func end_turn() -> void:
-	if player["energy"] > 0:
-		_gain_resource(player["energy"])
-		_add_log("余下灵能化为 %d 点%s。" % [player["energy"], player["resource_name"]])
 	discard_pile.append_array(hand)
 	hand = []
+	_trigger_enemy_turn_passive()
 	_resolve_enemy_turn()
 	if player["hp"] <= 0:
 		_add_log("气海崩散，此行止步。")
+		return
+	if enemy["hp"] <= 0:
+		_win_combat()
 		return
 	_choose_enemy_move()
 	_start_player_turn()
@@ -118,14 +129,19 @@ func is_complete() -> bool:
 	return floor >= ACT_LENGTH and enemy["hp"] <= 0
 
 func _apply_card(card: Dictionary) -> void:
+	var card_type: String = String(card.get("type", "skill"))
 	if card.has("damage"):
-		_deal_damage(int(card["damage"]))
+		var bonus := 0
+		if card_type == "attack" and player["passive"]["id"] == "ji_chen" and int(player["attacks_played"]) > 0 and int(player["attacks_played"]) % 3 == 0:
+			bonus = 2
+			_add_log("积尘：尘埃凝聚，本击 +2。")
+		_deal_damage(int(card["damage"]) + bonus)
+	if card_type == "attack":
+		player["attacks_played"] = int(player["attacks_played"]) + 1
 	if card.has("block"):
 		_gain_block(int(card["block"]))
-	if card.has("resource"):
-		_gain_resource(int(card["resource"]))
 	if card.has("burn"):
-		enemy["burn"] += int(card["burn"])
+		enemy["burn"] = int(enemy["burn"]) + int(card["burn"])
 		_add_log("%s 身上留下 %d 层灼痕。" % [enemy["name"], card["burn"]])
 	if card.has("draw"):
 		_draw_cards(int(card["draw"]))
@@ -135,54 +151,51 @@ func _apply_card(card: Dictionary) -> void:
 		_add_log("气血回复 %d。" % amount)
 
 func _deal_damage(amount: int) -> void:
-	if player["transcendent"]:
-		amount += 8
-		player["transcendent"] = false
-		_add_log("通玄之势爆发。")
-	var blocked: int = min(enemy["block"], amount)
+	var blocked: int = min(int(enemy["block"]), amount)
 	enemy["block"] -= blocked
 	enemy["hp"] -= amount - blocked
 	_add_log("%s 受 %d 点伤害。" % [enemy["name"], amount - blocked])
 
 func _gain_block(amount: int) -> void:
-	player["block"] += amount
+	player["block"] = int(player["block"]) + amount
 	_add_log("护体 +%d。" % amount)
 
-func _gain_resource(amount: int) -> void:
-	if amount <= 0:
-		return
-	player["resource"] = min(player["max_resource"], player["resource"] + amount)
-	if player["resource"] >= player["max_resource"] and not player["transcendent"]:
-		player["resource"] = 0
-		player["transcendent"] = true
-		_add_log("%s贯通，进入「通玄」。" % player["resource_name"])
+func _trigger_enemy_turn_passive() -> void:
+	if player["passive"]["id"] == "re_sou" and int(enemy["burn"]) > 0:
+		enemy["burn"] = int(enemy["burn"]) + 1
+		_add_log("热搜：%s 灼痕 +1。" % enemy["name"])
 
 func _resolve_enemy_turn() -> void:
 	var move: Dictionary = enemy["next_move"]
 	enemy["block"] = 0
 	if move["intent"] == "attack":
 		var amount: int = int(move["amount"]) + int(enemy["strength"])
-		var blocked: int = min(player["block"], amount)
+		var blocked: int = min(int(player["block"]), amount)
 		player["block"] -= blocked
-		player["hp"] -= amount - blocked
-		_add_log("%s 造成 %d 点伤害。" % [enemy["name"], amount - blocked])
+		var taken: int = amount - blocked
+		player["hp"] -= taken
+		_add_log("%s 造成 %d 点伤害。" % [enemy["name"], taken])
+		if taken > 0 and player["passive"]["id"] == "si_xian" and int(player["deathline_triggers"]) < 3:
+			player["block"] = int(player["block"]) + 1
+			player["deathline_triggers"] = int(player["deathline_triggers"]) + 1
+			_add_log("死线：身体先于脑子反应，护体 +1。")
 	elif move["intent"] == "block":
 		enemy["block"] += int(move["amount"])
 		_add_log("%s 凝起 %d 点护体。" % [enemy["name"], move["amount"]])
 	elif move["intent"] == "buff":
-		enemy["strength"] += int(move["amount"])
+		enemy["strength"] = int(enemy["strength"]) + int(move["amount"])
 		_add_log("%s 攻势上涨 +%d。" % [enemy["name"], move["amount"]])
 
 func _choose_enemy_move() -> void:
-	enemy["move_index"] += 1
-	enemy["next_move"] = enemy["moves"][enemy["move_index"] % enemy["moves"].size()]
+	enemy["move_index"] = int(enemy["move_index"]) + 1
+	enemy["next_move"] = enemy["moves"][int(enemy["move_index"]) % enemy["moves"].size()]
 
 func _apply_burn() -> void:
 	if enemy.get("burn", 0) <= 0:
 		return
-	enemy["hp"] -= enemy["burn"]
+	enemy["hp"] -= int(enemy["burn"])
 	_add_log("%s 灼痕发作，受 %d 点伤害。" % [enemy["name"], enemy["burn"]])
-	enemy["burn"] = max(0, enemy["burn"] - 1)
+	enemy["burn"] = max(0, int(enemy["burn"]) - 1)
 	if enemy["hp"] <= 0:
 		_win_combat()
 

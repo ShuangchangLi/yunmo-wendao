@@ -1,21 +1,28 @@
 import {
   ACT_LENGTH,
   CARD_LIBRARY,
-  CULTIVATORS,
+  CHARACTERS,
+  ORGANIZATIONS,
   GAME_TITLE,
+  GAME_SUBTITLE,
+  GAME_TAGLINE,
   KEYWORDS,
   addRewardCard,
-  chooseCultivator,
   closeCodex,
+  confirmSelection,
   createGame,
   endTurn,
+  gotoSelect,
+  gotoSplash,
+  pickPendingCharacter,
+  pickPendingOrganization,
   playCard,
   restartGame,
   showCodex,
   skipReward,
 } from "./game.js";
 
-const SAVE_KEY = "nixu-wendao-save";
+const SAVE_KEY = "cyber-longevity-save";
 const SPRITE_FRAME_MS = 160;
 
 let game = createGame();
@@ -58,84 +65,177 @@ function spriteAttrs(strip, frames, fallback) {
 
 function renderScreen() {
   if (game.screen === "codex") return renderCodex();
-  if (game.screen === "start") return renderStart();
+  if (game.screen === "splash") return renderSplash();
+  if (game.screen === "select") return renderSelect();
   if (game.screen === "defeat") return renderDefeat();
   if (game.screen === "reward") return renderReward();
   if (game.screen === "complete") return renderComplete();
   return renderCombat();
 }
 
-function renderStart() {
+function renderSplash() {
   const hasSave = Boolean(loadGame());
   return `
-    <section class="start-v2 cyber">
-      <div class="start-hero cyber">
-        <img src="./src/assets/cyber-city.svg" alt="" />
-        <div class="start-copy">
-          <p class="seal">天机城夜巡 / 三战 MVP</p>
-          <h1>${GAME_TITLE}</h1>
-          <p class="subtitle">底层身份修成大道。灵污清洁工、社畜、灵网主播，从霓虹雨夜里打出自己的第一段道途。</p>
-          <div class="start-menu">
-            <button class="primary" data-action="new-run">新的夜巡</button>
-            <button class="ghost light" data-action="continue" ${hasSave ? "" : "disabled"}>继续存档</button>
-            <button class="ghost light" data-action="open-codex">天机档案</button>
-          </div>
+    <section class="splash splash-home" aria-label="${GAME_TITLE} ${GAME_SUBTITLE}">
+      <div class="home-bg" aria-hidden="true"></div>
+
+      <aside class="home-panel cultivation-panel" aria-label="修仙进度">
+        <div class="meditate-icon">♟</div>
+        <div>
+          <p>修仙进度</p>
+          <strong>炼气三层</strong>
+          <span>230/1000</span>
+          <div class="progress-dots"><i></i><i></i><i></i><i></i><b></b><b></b><b></b><b></b><b></b><b></b></div>
         </div>
+      </aside>
+
+      <aside class="home-panel insight-panel" aria-label="今日悟道">
+        <p>今日悟道</p>
+        <ul>
+          <li><span>灵气 +1</span><em>▲</em></li>
+          <li><span>KPI +1</span><em>▲</em></li>
+          <li class="bad"><span>寿命 -1</span><em>▼</em></li>
+        </ul>
+        <div class="signal-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </aside>
+
+      <nav class="home-side-nav" aria-label="主页快捷入口">
+        <button type="button" data-action="open-codex"><span>⌘</span><em>功法</em></button>
+        <button type="button" data-action="open-codex"><span>▣</span><em>卡牌</em></button>
+        <button type="button"><span>◇</span><em>道具</em></button>
+        <button type="button"><span>⚙</span><em>系统</em></button>
+      </nav>
+
+      <div class="home-primary-actions" aria-label="主要操作">
+        <button class="home-main-cta" data-action="goto-select">打工修仙录</button>
+        <button class="home-continue" data-action="continue" ${hasSave ? "" : "disabled"}>继续存档</button>
       </div>
-      <section class="cultivator-grid compact" aria-label="选择入城身份">
-        ${Object.values(CULTIVATORS).map(renderCultivator).join("")}
-      </section>
+
+      <button class="home-vertical-cta" data-action="goto-select" aria-label="加班炼体">加班<br />炼体</button>
+
+      <footer class="home-dock" aria-label="底部菜单">
+        <button type="button" data-action="goto-select"><span>⚔</span><em>战斗</em></button>
+        <button type="button" data-action="open-codex"><span>▧</span><em>卡牌</em></button>
+        <button type="button" data-action="goto-select"><span>♟</span><em>修炼</em></button>
+        <button type="button"><span>▤</span><em>商店</em></button>
+        <button type="button"><span>▥</span><em>地图</em></button>
+        <button type="button"><span>⚙</span><em>设置</em></button>
+      </footer>
+
+      <p class="home-player-id">修仙ID：0019527</p>
     </section>
   `;
 }
 
-function renderCultivator(cultivator) {
+function renderSelect() {
+  const character = game.pendingCharacter ? CHARACTERS[game.pendingCharacter] : null;
+  const organization = game.pendingOrganization ? ORGANIZATIONS[game.pendingOrganization] : null;
+  const ready = Boolean(character && organization);
   return `
-    <button class="cultivator-card cyber-card ${cultivator.id}" data-action="choose-cultivator" data-cultivator="${cultivator.id}">
-      <div class="role-art role-art-anim"${spriteAttrs(cultivator.idleStrip, cultivator.idleFrames, cultivator.avatar)}></div>
-      <span class="role-mark">${cultivator.mark}</span>
-      <strong>${cultivator.name} <em>-> ${cultivator.finalTitle}</em></strong>
-      <small>${cultivator.school}</small>
-      <p>${cultivator.trait}</p>
-      <div class="keyword-row">${cultivator.keywords.map(keywordChip).join("")}</div>
-      <ol class="stage-line">${cultivator.stages.map((stage) => `<li>${stage}</li>`).join("")}</ol>
+    <section class="select">
+      <header class="select-head">
+        <button class="ghost" data-action="goto-splash">‹ 返回</button>
+        <h1>挑一个普通人，挂上一个组织</h1>
+        <button class="ghost" data-action="open-codex">天机档案</button>
+      </header>
+
+      <section class="select-section">
+        <h2>选择你的人物</h2>
+        <div class="select-grid characters">
+          ${Object.values(CHARACTERS).map((c) => renderCharacterCard(c, c.id === game.pendingCharacter)).join("")}
+        </div>
+      </section>
+
+      <section class="select-section">
+        <h2>选择你隶属的组织</h2>
+        <div class="select-grid organizations">
+          ${Object.values(ORGANIZATIONS).map((o) => renderOrganizationCard(o, o.id === game.pendingOrganization)).join("")}
+        </div>
+      </section>
+
+      <footer class="select-foot">
+        <p class="select-summary">
+          ${character ? `<strong>${character.name}</strong> · ${character.profession}` : "<em>请先选择人物</em>"}
+          ${character && organization ? " · " : ""}
+          ${organization ? `<strong style="color:${organization.color}">${organization.name}</strong>` : (character ? "<em>再挑一个组织</em>" : "")}
+        </p>
+        <button class="primary big" data-action="confirm-selection" ${ready ? "" : "disabled"}>进入夜巡</button>
+      </footer>
+    </section>
+  `;
+}
+
+function renderCharacterCard(character, selected) {
+  return `
+    <button class="char-card ${selected ? "selected" : ""}" data-action="pick-character" data-character="${character.id}">
+      <div class="char-art role-art-anim"${spriteAttrs(character.idleStrip, character.idleFrames, character.avatar)}></div>
+      <div class="char-meta">
+        <div class="char-name-row">
+          <strong>${character.name}</strong>
+          <span class="char-prof">${character.profession}</span>
+        </div>
+        <p class="char-tag">${character.tagline}</p>
+        <div class="char-stats">
+          <span><em>气血</em>${character.maxHp}</span>
+          <span><em>能量</em>3</span>
+        </div>
+        <div class="char-passive">
+          <em>${character.passive.name}</em>
+          <span>${character.passive.text}</span>
+        </div>
+      </div>
+    </button>
+  `;
+}
+
+function renderOrganizationCard(org, selected) {
+  return `
+    <button class="org-card ${selected ? "selected" : ""}" data-action="pick-organization" data-organization="${org.id}" style="--accent:${org.color}">
+      <strong>${org.name}</strong>
+      <p>${org.tagline}</p>
+      <span class="org-tag">机制效果待解锁</span>
     </button>
   `;
 }
 
 function renderCombat() {
+  const character = CHARACTERS[game.player.characterId];
+  const orgColor = game.player.organizationColor;
   return `
-    <section class="combat-layout v2 cyber">
-      <header class="topbar cyber-panel">
-        <div>
-          <p class="eyebrow">第 ${game.floor} 战 / ${ACT_LENGTH} 战短线夜巡</p>
-          <h1>${game.player.name} <span>${game.player.finalTitle}</span></h1>
+    <section class="combat-v3" style="--player-accent:${orgColor}">
+      <header class="combat-bar">
+        <button class="ghost slim" data-action="goto-splash">‹ 退出</button>
+        <div class="combat-progress">
+          <span class="eyebrow">第 ${game.floor} / ${ACT_LENGTH} 战</span>
+          <strong>${game.player.name}<em>· ${game.player.profession}</em></strong>
+          <span class="org-chip" style="--accent:${orgColor}">${game.player.organizationName}</span>
         </div>
-        <div class="combat-resources">
-          ${energyOrbs(game.player.energy, game.player.maxEnergy)}
-          ${classMeter(game.player.resourceName, game.player.qi, game.player.maxQi, game.player.transcendent)}
-          <button class="icon-button" data-action="exit-title" title="返回主界面">退</button>
-          <button class="icon-button" data-action="open-codex" title="天机档案">档</button>
-          <button class="icon-button" data-action="toggle-log" title="战斗历史">史</button>
+        <div class="combat-bar-actions">
+          <button class="ghost slim" data-action="open-codex">档案</button>
+          <button class="ghost slim" data-action="toggle-log">${logOpen ? "收起" : "战史"}</button>
         </div>
       </header>
 
-      <section class="battlefield v2 cyber-field">
-        ${renderCombatant("player")}
-        <div class="clash-mark">对</div>
+      <section class="stage">
+        ${renderCombatant("player", character)}
+        <div class="stage-center">
+          <div class="stage-vfx">
+            <span class="stage-eyebrow">出招舞台</span>
+            <p class="stage-hint">${stageHint()}</p>
+          </div>
+        </div>
         ${renderCombatant("enemy")}
       </section>
 
-      <section class="hand-panel cyber-panel">
-        <div class="pile-row">
-          ${miniStat("抽牌", game.player.drawPile.length)}
-          ${miniStat("弃牌", game.player.discardPile.length)}
-          ${miniStat("回合", game.turn)}
+      <section class="hand-bar">
+        <div class="energy-corner" aria-label="能量 ${game.player.energy} / ${game.player.maxEnergy}">
+          <strong>${game.player.energy}<span>/${game.player.maxEnergy}</span></strong>
+          <em>能量</em>
         </div>
         <div class="hand">
           ${game.player.hand.map((cardId, index) => cardButton(cardId, "play", index)).join("")}
         </div>
-        <button class="end-turn" data-action="end-turn">结束回合</button>
+        <button class="end-turn" data-action="end-turn">结束<br>回合</button>
       </section>
 
       ${renderLogDrawer()}
@@ -143,58 +243,56 @@ function renderCombat() {
   `;
 }
 
-function renderCombatant(side) {
+function stageHint() {
+  const move = game.enemy?.nextMove;
+  if (!move) return "夜巡频道开始记录。";
+  if (move.intent === "attack") return `${game.enemy.name} 准备出招。`;
+  if (move.intent === "block") return `${game.enemy.name} 凝起护体。`;
+  if (move.intent === "buff") return `${game.enemy.name} 蓄势变强。`;
+  return "对峙中。";
+}
+
+function renderCombatant(side, characterIfPlayer) {
   const isEnemy = side === "enemy";
   const unit = isEnemy ? game.enemy : game.player;
   const hpMax = unit.maxHp;
   const hp = unit.hp;
+  const profession = isEnemy ? unit.title : characterIfPlayer.profession;
   return `
-    <article class="combatant ${side} v2 cyber-panel">
-      <div class="unit-top ${isEnemy ? "" : "player-top"}">
-        ${isEnemy ? enemyIntent() : playerFocus()}
-        <div class="portrait-frame">
-          <div class="enemy-art role-art-anim role-art-large"${spriteAttrs(unit.idleStrip, unit.idleFrames, isEnemy ? unit.art : unit.avatar)} aria-label="${unit.name}"></div>
-        </div>
+    <article class="combatant-v3 ${side}">
+      <div class="portrait">
+        <div class="portrait-art role-art-anim"${spriteAttrs(unit.idleStrip, unit.idleFrames, isEnemy ? unit.art : unit.avatar)} aria-label="${unit.name}"></div>
+        ${isEnemy ? renderIntent() : ""}
       </div>
-      <div class="combatant-title">
-        <p class="eyebrow">${isEnemy ? unit.title : unit.school}</p>
-        <h2>${unit.name}</h2>
-      </div>
-      <div class="vitals">
-        <div class="hp-strip">
+      <p class="unit-tag">${profession}</p>
+      <h2 class="unit-name">${unit.name}</h2>
+      <div class="hp-row">
+        <div class="hp-bar">
           <i style="width:${Math.max(0, Math.min(100, (hp / hpMax) * 100))}%"></i>
           <span>${hp}/${hpMax}</span>
         </div>
-        <div class="shield ${unit.block > 0 ? "active" : ""}">
-          <span>护</span>
+        <div class="block-pip ${unit.block > 0 ? "active" : ""}" title="护体">
+          <em>护</em>
           <strong>${unit.block}</strong>
         </div>
       </div>
-      <div class="status-row">
-        ${isEnemy ? statusBadge("攻势", unit.strength) + statusBadge("灼痕", unit.burn) : statusBadge(unit.resourceName, unit.qi) + statusBadge("通玄", unit.transcendent ? "已成" : "未成")}
+      <div class="status-pips">
+        ${unit.burn > 0 ? `<span class="pip burn">灼痕 ${unit.burn}</span>` : ""}
+        ${isEnemy && unit.strength > 0 ? `<span class="pip buff">攻势 +${unit.strength}</span>` : ""}
       </div>
     </article>
   `;
 }
 
-function playerFocus() {
-  return `
-    <div class="intent-card focus">
-      <span>道</span>
-      <strong>身份修行</strong>
-      <p>资源满后进入通玄，下一张伤害牌额外 +8。</p>
-    </div>
-  `;
-}
-
-function enemyIntent() {
+function renderIntent() {
   const move = game.enemy.nextMove;
+  if (!move) return "";
   const amount = move.amount + (move.intent === "attack" ? game.enemy.strength : 0);
   return `
-    <div class="intent-card ${move.intent}">
-      <span>${intentIcon(move.intent)}</span>
+    <div class="intent-bubble ${move.intent}">
+      <span class="intent-icon">${intentIcon(move.intent)}</span>
       <strong>${move.label}</strong>
-      <p>${intentLabel(move.intent)} ${amount}</p>
+      <small>${intentLabel(move.intent)} ${amount}</small>
     </div>
   `;
 }
@@ -203,7 +301,7 @@ function renderLogDrawer() {
   return `
     <aside class="log-drawer ${logOpen ? "open" : ""}">
       <button class="log-tab" data-action="toggle-log">${logOpen ? "收起" : "战史"}</button>
-      <div class="log-panel cyber-panel">
+      <div class="log-panel">
         <h2>战斗历史</h2>
         ${game.log.map((entry) => `<p>${entry}</p>`).join("")}
       </div>
@@ -213,58 +311,71 @@ function renderLogDrawer() {
 
 function renderReward() {
   return `
-    <section class="reward panel cyber-panel">
+    <section class="reward panel">
       <p class="seal">法诀芯片</p>
       <h1>截获一枚新法诀</h1>
-      <p>选一张加入牌组。当前 MVP 先保持基础战斗，职业成长系统后面再接。</p>
+      <p class="muted">选一张加入牌组，或跳过。</p>
       <div class="reward-grid">
         ${game.rewardChoices.map((cardId) => cardButton(cardId, "reward")).join("")}
       </div>
-      <button class="ghost" data-action="skip-reward">跳过</button>
-      <button class="ghost" data-action="exit-title">返回主界面</button>
+      <div class="row gap">
+        <button class="ghost" data-action="skip-reward">跳过</button>
+        <button class="ghost" data-action="goto-splash">退出夜巡</button>
+      </div>
     </section>
   `;
 }
 
 function renderComplete() {
   return `
-    <section class="panel end-state cyber-panel">
+    <section class="panel end-state">
       <p class="seal">夜巡完成</p>
-      <h1>第一段试炼完成</h1>
-      <p>你击退了霓灯犬、铁鬃械猪和黑巷劫修。三职业、三场战斗、基础卡牌循环和赛博修仙视觉已经跑通。</p>
-      <button class="primary" data-action="new-run">再来一轮</button>
-      <button class="ghost" data-action="exit-title">返回主界面</button>
+      <h1>第一段试炼通过</h1>
+      <p class="muted">三场战斗、三位敌人，全部清理。下一段还在写。</p>
+      <div class="row gap">
+        <button class="primary" data-action="goto-select">再来一轮</button>
+        <button class="ghost" data-action="goto-splash">返回主界面</button>
+      </div>
     </section>
   `;
 }
 
 function renderDefeat() {
   return `
-    <section class="panel end-state cyber-panel">
+    <section class="panel end-state">
       <p class="seal">夜巡中断</p>
       <h1>气海崩散</h1>
-      <p>天机城还在下雨。下一次入城，牌序会不同。</p>
-      <button class="primary" data-action="new-run">重新夜巡</button>
-      <button class="ghost" data-action="exit-title">返回主界面</button>
+      <p class="muted">天机城还在下雨。下一次入城，牌序会不同。</p>
+      <div class="row gap">
+        <button class="primary" data-action="goto-select">重新夜巡</button>
+        <button class="ghost" data-action="goto-splash">返回主界面</button>
+      </div>
     </section>
   `;
 }
 
 function renderCodex() {
   return `
-    <section class="codex panel cyber-panel">
-      <div class="codex-head">
+    <section class="codex panel">
+      <header class="codex-head">
         <div>
           <p class="seal">天机档案</p>
-          <h1>霓墟资料库</h1>
+          <h1>资料库</h1>
         </div>
         <button class="ghost" data-action="close-codex">返回</button>
-      </div>
+      </header>
 
       <section class="codex-section">
-        <h2>入城身份</h2>
+        <h2>三个普通人</h2>
         <div class="codex-grid">
-          ${Object.values(CULTIVATORS).map(renderRouteCard).join("")}
+          ${Object.values(CHARACTERS).map(renderCharacterCard).join("")}
+        </div>
+      </section>
+
+      <section class="codex-section">
+        <h2>三个组织</h2>
+        <div class="codex-grid orgs">
+          ${Object.values(ORGANIZATIONS).map((o) => renderOrganizationCard(o, false)).join("")}
         </div>
       </section>
 
@@ -278,91 +389,39 @@ function renderCodex() {
       <section class="codex-section">
         <h2>关键词</h2>
         <div class="keyword-dictionary">
-          ${Object.entries(KEYWORDS).map(([, keyword]) => `<article><strong>${keyword.name}</strong><p>${keyword.text}</p></article>`).join("")}
+          ${Object.values(KEYWORDS).map((k) => `<article><strong>${k.name}</strong><p>${k.text}</p></article>`).join("")}
         </div>
       </section>
     </section>
   `;
 }
 
-function renderRouteCard(cultivator) {
-  return `
-    <article class="route-card">
-      <div class="route-art role-art-anim"${spriteAttrs(cultivator.idleStrip, cultivator.idleFrames, cultivator.avatar)}></div>
-      <span class="role-mark small">${cultivator.mark}</span>
-      <h3>${cultivator.name} -> ${cultivator.finalTitle}</h3>
-      <p>${cultivator.trait}</p>
-      <ol class="stage-line expanded">${cultivator.stages.map((stage) => `<li>${stage}</li>`).join("")}</ol>
-    </article>
-  `;
-}
-
 function cardButton(cardId, mode, index = 0) {
   const card = CARD_LIBRARY[cardId];
-  const disabled = mode === "play" && game.player.energy < card.cost ? "disabled" : "";
+  const disabled = mode === "play" && game.player && game.player.energy < card.cost ? "disabled" : "";
   const action = mode === "play" ? "play-card" : mode === "reward" ? "choose-reward" : "noop";
   return `
-    <button class="card ${card.type}" data-action="${action}" data-card="${cardId}" data-index="${index}" ${disabled}>
+    <button class="card ${card.type} owner-${card.owner}" data-action="${action}" data-card="${cardId}" data-index="${index}" ${disabled}>
       <span class="cost">${card.cost}</span>
-      <span class="kind">${card.kind}</span>
+      <span class="kind">${card.type === "attack" ? "攻击" : "技能"}</span>
       <img class="card-art" src="${cardIcon(card)}" alt="" />
       <strong>${card.name}</strong>
       <p>${card.text}</p>
-      <div class="keyword-row">${card.keywords.map(keywordChip).join("")}</div>
-      ${keywordPopover(card.keywords)}
     </button>
   `;
 }
 
-function keywordChip(id) {
-  return `<span class="keyword-chip">${KEYWORDS[id]?.name || id}</span>`;
-}
-
 function cardIcon(card) {
-  if (card.keywords.includes("qingzhuo") || card.keywords.includes("huifeng") || card.keywords.includes("powang")) {
+  if (card.owner === "zhou") {
     return card.type === "attack" ? "./src/assets/pixel/card-cleaner-attack.png" : "./src/assets/pixel/card-cleaner-skill.png";
   }
-  if (card.keywords.includes("shouxing") || card.keywords.includes("chengya") || card.keywords.includes("kuanghua")) {
+  if (card.owner === "ke") {
     return card.type === "attack" ? "./src/assets/pixel/card-worker-attack.png" : "./src/assets/pixel/card-worker-skill.png";
   }
-  if (card.keywords.includes("renqi") || card.keywords.includes("danmu") || card.keywords.includes("zhumu")) {
+  if (card.owner === "su") {
     return card.type === "attack" ? "./src/assets/pixel/card-streamer-attack.png" : "./src/assets/pixel/card-streamer-skill.png";
   }
   return "./src/assets/pixel/card-breath.png";
-}
-
-function keywordPopover(ids) {
-  return `
-    <aside class="keyword-popover">
-      ${ids.map((id) => `<div><strong>${KEYWORDS[id]?.name || id}</strong><p>${KEYWORDS[id]?.text || ""}</p></div>`).join("")}
-    </aside>
-  `;
-}
-
-function energyOrbs(current, max) {
-  return `
-    <div class="energy-cluster" aria-label="灵能 ${current}/${max}">
-      <span>灵能</span>
-      <div>${Array.from({ length: max }, (_, index) => `<i class="${index < current ? "filled" : ""}"></i>`).join("")}</div>
-    </div>
-  `;
-}
-
-function classMeter(label, current, max, active) {
-  return `
-    <div class="class-meter ${active ? "transcendent" : ""}">
-      <span>${active ? "通玄" : label}</span>
-      <div>${Array.from({ length: max }, (_, index) => `<i class="${index < current ? "filled" : ""}"></i>`).join("")}</div>
-    </div>
-  `;
-}
-
-function miniStat(label, value) {
-  return `<div class="mini-stat"><span>${label}</span><strong>${value}</strong></div>`;
-}
-
-function statusBadge(label, value) {
-  return `<span class="status-badge"><em>${label}</em>${value}</span>`;
 }
 
 function intentIcon(intent) {
@@ -372,9 +431,9 @@ function intentIcon(intent) {
 }
 
 function intentLabel(intent) {
-  if (intent === "attack") return "将造成";
-  if (intent === "block") return "将获得护体";
-  return "将强化攻势";
+  if (intent === "attack") return "造成";
+  if (intent === "block") return "护体 +";
+  return "攻势 +";
 }
 
 function bindEvents() {
@@ -383,7 +442,9 @@ function bindEvents() {
       const action = element.dataset.action;
       let shouldSave = true;
 
-      if (action === "choose-cultivator") chooseCultivator(game, element.dataset.cultivator);
+      if (action === "pick-character") pickPendingCharacter(game, element.dataset.character);
+      if (action === "pick-organization") pickPendingOrganization(game, element.dataset.organization);
+      if (action === "confirm-selection") confirmSelection(game);
       if (action === "play-card") playCard(game, Number(element.dataset.index));
       if (action === "end-turn") endTurn(game);
       if (action === "choose-reward") addRewardCard(game, element.dataset.card);
@@ -400,13 +461,15 @@ function bindEvents() {
         logOpen = !logOpen;
         shouldSave = false;
       }
-      if (action === "exit-title") {
+      if (action === "goto-splash") {
         game = createGame();
+        gotoSplash(game);
         logOpen = false;
         shouldSave = false;
       }
-      if (action === "new-run") {
-        game = restartGame();
+      if (action === "goto-select") {
+        game = createGame();
+        gotoSelect(game);
         clearSave();
         logOpen = false;
         shouldSave = false;
@@ -424,7 +487,7 @@ function bindEvents() {
 }
 
 function saveGame(value) {
-  if (!value.player) return;
+  if (!value.player || value.screen === "splash" || value.screen === "select") return;
   localStorage.setItem(SAVE_KEY, JSON.stringify(value));
 }
 

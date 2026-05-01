@@ -1,166 +1,164 @@
 {
   "sweep_cut": {
     "name": "扫尘斩",
-    "kind": "清洁刀",
+    "type": "attack",
     "cost": 1,
-    "text": "造成 7 点伤害，获得 1 点清浊。",
+    "text": "造成 7 点伤害。",
     "damage": 7,
-    "resource": 1,
-    "keywords": ["qingzhuo"]
+    "owner": "zhou"
   },
   "recycle_edge": {
     "name": "回收刃",
-    "kind": "霓刃",
+    "type": "attack",
     "cost": 1,
     "text": "造成 4 点伤害，抽 1 张牌。",
     "damage": 4,
     "draw": 1,
-    "keywords": ["huifeng"]
+    "owner": "zhou"
   },
   "neon_backhand": {
     "name": "霓刃回锋",
-    "kind": "剑势",
+    "type": "attack",
     "cost": 1,
-    "text": "造成 5 点伤害，获得 1 点清浊。",
+    "text": "造成 5 点伤害，获得 3 点护体。",
     "damage": 5,
-    "resource": 1,
-    "keywords": ["huifeng", "qingzhuo"]
+    "block": 3,
+    "owner": "zhou"
   },
   "clean_break": {
     "name": "破网清算",
-    "kind": "清障",
+    "type": "attack",
     "cost": 2,
     "text": "造成 13 点伤害。",
     "damage": 13,
-    "keywords": ["powang"]
+    "owner": "zhou"
   },
   "filter_guard": {
     "name": "滤阵护身",
-    "kind": "护体",
+    "type": "skill",
     "cost": 1,
     "text": "获得 7 点护体。",
     "block": 7,
-    "keywords": ["huti"]
+    "owner": "zhou"
   },
   "dust_step": {
     "name": "尘步",
-    "kind": "身法",
+    "type": "skill",
     "cost": 0,
     "text": "获得 3 点护体。",
     "block": 3,
-    "keywords": ["huti"]
+    "owner": "zhou"
   },
   "overtime_claw": {
     "name": "加班爪击",
-    "kind": "兽化",
+    "type": "attack",
     "cost": 1,
-    "text": "造成 6 点伤害，获得 1 点兽性。",
+    "text": "造成 6 点伤害，获得 2 点护体。",
     "damage": 6,
-    "resource": 1,
-    "keywords": ["shouxing"]
+    "block": 2,
+    "owner": "ke"
   },
   "deadline_guard": {
     "name": "死线硬撑",
-    "kind": "承压",
+    "type": "skill",
     "cost": 1,
     "text": "获得 8 点护体。",
     "block": 8,
-    "keywords": ["chengya", "huti"]
+    "owner": "ke"
   },
   "bone_growth": {
     "name": "兽骨增生",
-    "kind": "异变",
+    "type": "skill",
     "cost": 1,
-    "text": "获得 5 点护体，获得 1 点兽性。",
+    "text": "获得 5 点护体，抽 1 张牌。",
     "block": 5,
-    "resource": 1,
-    "keywords": ["shouxing", "huti"]
+    "draw": 1,
+    "owner": "ke"
   },
   "rage_commute": {
     "name": "通勤怒火",
-    "kind": "狂化",
+    "type": "attack",
     "cost": 1,
     "text": "造成 5 点伤害，附加 2 层灼痕。",
     "damage": 5,
     "burn": 2,
-    "keywords": ["kuanghua"]
+    "owner": "ke"
   },
   "beast_shift": {
     "name": "兽相显形",
-    "kind": "终局",
+    "type": "attack",
     "cost": 2,
     "text": "造成 12 点伤害，回复 3 点气血。",
     "damage": 12,
     "heal": 3,
-    "keywords": ["shouxing"]
+    "owner": "ke"
   },
   "last_train": {
     "name": "末班奔袭",
-    "kind": "身法",
+    "type": "skill",
     "cost": 0,
-    "text": "获得 2 点兽性。",
-    "resource": 2,
-    "keywords": ["shouxing"]
+    "text": "抽 2 张牌。",
+    "draw": 2,
+    "owner": "ke"
   },
   "go_live": {
     "name": "开播",
-    "kind": "香火",
+    "type": "attack",
     "cost": 1,
-    "text": "造成 5 点伤害，获得 1 点人气。",
+    "text": "造成 5 点伤害，获得 2 点护体。",
     "damage": 5,
-    "resource": 1,
-    "keywords": ["renqi"]
+    "block": 2,
+    "owner": "su"
   },
   "bullet_guard": {
     "name": "弹幕护体",
-    "kind": "弹幕",
+    "type": "skill",
     "cost": 1,
     "text": "获得 7 点护体。",
     "block": 7,
-    "keywords": ["danmu", "huti"]
+    "owner": "su"
   },
   "hot_search": {
     "name": "热搜符",
-    "kind": "注目",
+    "type": "attack",
     "cost": 1,
     "text": "造成 4 点伤害，附加 3 层灼痕。",
     "damage": 4,
     "burn": 3,
-    "keywords": ["zhumu"]
+    "owner": "su"
   },
   "fan_mirror": {
     "name": "粉丝镜阵",
-    "kind": "香火",
+    "type": "skill",
     "cost": 1,
     "text": "获得 4 点护体，抽 1 张牌。",
     "block": 4,
     "draw": 1,
-    "keywords": ["renqi", "huti"]
+    "owner": "su"
   },
   "crowd_focus": {
     "name": "万众注目",
-    "kind": "终局",
+    "type": "attack",
     "cost": 2,
-    "text": "造成 10 点伤害，获得 2 点人气。",
+    "text": "造成 10 点伤害，附加 2 层灼痕。",
     "damage": 10,
-    "resource": 2,
-    "keywords": ["zhumu", "renqi"]
+    "burn": 2,
+    "owner": "su"
   },
   "spotlight_step": {
     "name": "镜头位移",
-    "kind": "身法",
+    "type": "skill",
     "cost": 0,
     "text": "获得 3 点护体。",
     "block": 3,
-    "keywords": ["huti"]
+    "owner": "su"
   },
   "breath": {
     "name": "调息",
-    "kind": "通用",
+    "type": "skill",
     "cost": 0,
-    "text": "获得 2 点职业资源，抽 1 张牌。",
-    "resource": 2,
-    "draw": 1,
-    "keywords": ["lingli"]
+    "text": "抽 2 张牌。",
+    "draw": 2,
+    "owner": "common"
   }
 }

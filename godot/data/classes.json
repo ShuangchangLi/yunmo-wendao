@@ -1,41 +1,62 @@
 {
-  "cleaner": {
-    "name": "灵污清洁工",
-    "final_title": "霓刃剑仙",
-    "school": "环卫司外勤",
-    "resource_name": "清浊",
-    "trait": "以清洁刀、灵污罐和霓光飞刃作战。擅长低费连击、破盾和清除污染。",
+  "zhou": {
+    "name": "老周",
+    "profession": "清洁工",
+    "tagline": "拿过千斤刀的扫地僧。",
     "visual": "cleaner",
-    "mark": "净",
-    "max_hp": 70,
-    "start_resource": 1,
-    "deck": ["sweep_cut", "sweep_cut", "sweep_cut", "filter_guard", "filter_guard", "breath", "recycle_edge", "dust_step"],
-    "rewards": ["recycle_edge", "neon_backhand", "filter_guard", "dust_step", "clean_break"]
-  },
-  "worker": {
-    "name": "社畜",
-    "final_title": "兽相真君",
-    "school": "天机城庶务楼",
-    "resource_name": "兽性",
-    "trait": "被工时、丹药和义体压到兽化。擅长承压、反打和狂化爆发。",
-    "visual": "worker",
-    "mark": "兽",
     "max_hp": 78,
-    "start_resource": 0,
-    "deck": ["overtime_claw", "overtime_claw", "overtime_claw", "deadline_guard", "deadline_guard", "breath", "bone_growth", "last_train"],
-    "rewards": ["bone_growth", "overtime_claw", "deadline_guard", "rage_commute", "beast_shift"]
+    "passive": {
+      "id": "ji_chen",
+      "name": "积尘",
+      "text": "每打出 3 张攻击牌，下一张攻击 +2 伤害。"
+    },
+    "deck": [
+      "sweep_cut", "sweep_cut", "sweep_cut",
+      "filter_guard", "filter_guard",
+      "recycle_edge",
+      "dust_step",
+      "breath"
+    ],
+    "rewards": ["recycle_edge", "neon_backhand", "filter_guard", "dust_step", "clean_break", "breath"]
   },
-  "streamer": {
-    "name": "灵网主播",
-    "final_title": "香火神女",
-    "school": "万象直播台",
-    "resource_name": "人气",
-    "trait": "把弹幕、打赏和注目修成香火神通。擅长控场、护体和热度爆发。",
+  "ke": {
+    "name": "小柯",
+    "profession": "社畜",
+    "tagline": "屏幕背面长出钢筋的码农。",
+    "visual": "worker",
+    "max_hp": 84,
+    "passive": {
+      "id": "si_xian",
+      "name": "死线",
+      "text": "受到伤害后获得 1 点护体（每回合最多触发 3 次）。"
+    },
+    "deck": [
+      "overtime_claw", "overtime_claw", "overtime_claw",
+      "deadline_guard", "deadline_guard",
+      "bone_growth",
+      "last_train",
+      "breath"
+    ],
+    "rewards": ["bone_growth", "overtime_claw", "deadline_guard", "rage_commute", "beast_shift", "last_train"]
+  },
+  "su": {
+    "name": "阿酥",
+    "profession": "主播",
+    "tagline": "弹幕海里的赛博歌姬。",
     "visual": "streamer",
-    "mark": "愿",
-    "max_hp": 64,
-    "start_resource": 0,
-    "deck": ["go_live", "go_live", "go_live", "bullet_guard", "bullet_guard", "breath", "hot_search", "spotlight_step"],
-    "rewards": ["hot_search", "bullet_guard", "fan_mirror", "go_live", "crowd_focus"]
+    "max_hp": 70,
+    "passive": {
+      "id": "re_sou",
+      "name": "热搜",
+      "text": "敌方回合开始时，若敌人有灼痕，灼痕层数 +1。"
+    },
+    "deck": [
+      "go_live", "go_live", "go_live",
+      "bullet_guard", "bullet_guard",
+      "hot_search",
+      "spotlight_step",
+      "breath"
+    ],
+    "rewards": ["hot_search", "bullet_guard", "fan_mirror", "go_live", "crowd_focus", "spotlight_step"]
   }
 }
