@@ -1,6 +1,6 @@
 export const GAME_TITLE = "赛博长生";
 export const GAME_SUBTITLE = "打工修仙录";
-export const GAME_TAGLINE = "在 5G 信号最差的天台上，他练第一缕罡气。";
+export const GAME_TAGLINE = "在 5G 信号最差的天台上，练第一缕灵气。";
 export const ACT_LENGTH = 3;
 
 export const KEYWORDS = {
@@ -16,16 +16,22 @@ export const CHARACTERS = {
     name: "老周",
     profession: "清洁工",
     visual: "cleaner",
-    avatar: "./src/assets/pixel/px-cleaner.png",
-    idleStrip: "./src/assets/pixel/px-cleaner-idle-strip.png",
-    idleFrames: 1,
+    avatar: "./src/assets/portraits/cleaner-headshot.png",
+    selectArt: "./src/assets/portraits/cleaner-scene.png",
+    selectPortrait: "./src/assets/portraits/cleaner-headshot.png",
+    selectStrip: null,
+    selectFrames: 1,
+    idleStrip: "./src/assets/rd/cleaner-combat-idle-strip.png",
+    idleFrames: 8,
+    attackStrip: "./src/assets/rd/cleaner-mop-attack-strip.png",
+    attackFrames: 8,
     maxHp: 78,
     passive: {
       id: "ji_chen",
       name: "积尘",
       text: "每打出 3 张攻击牌，下一张攻击 +2 伤害。",
     },
-    tagline: "拿过千斤刀的扫地僧。",
+    tagline: "拿过千斤拖把，也拿得起霓虹里的第一口气。",
     deck: [
       "sweep_cut", "sweep_cut", "sweep_cut",
       "filter_guard", "filter_guard",
@@ -47,9 +53,9 @@ export const CHARACTERS = {
     passive: {
       id: "si_xian",
       name: "死线",
-      text: "受到伤害后获得 1 点护体（每回合最多触发 3 次）。",
+      text: "受到伤害后获得 1 点护体，每回合最多触发 3 次。",
     },
-    tagline: "屏幕背面长出钢筋的码农。",
+    tagline: "屏幕后面长出钢筋的码农。",
     deck: [
       "overtime_claw", "overtime_claw", "overtime_claw",
       "deadline_guard", "deadline_guard",
@@ -90,28 +96,34 @@ export const ORGANIZATIONS = {
     id: "corp",
     name: "天机科技",
     color: "#55f7ff",
-    tagline: "亚洲最大的灵网基础设施商。机会都摆在那里。",
+    tagline: "亚洲最大的灵网基础设施商。机会都摆在那里，代价也一样。",
+    motto: "网在你身上，门在我手里",
+    art: "./src/assets/orgs/org-corp.png",
   },
   academy: {
     id: "academy",
     name: "太上学院",
     color: "#ffe36f",
-    tagline: "最后一个有「合法师承」的地方。从前学剑，现在学气脉编程。",
+    tagline: "最后一个有合法师承的地方。从前学剑，现在学气脉编程。",
+    motto: "传承可编译，剑意能开源",
+    art: "./src/assets/orgs/org-academy.png",
   },
   gang: {
     id: "gang",
     name: "夜行帮",
     color: "#ff53d5",
     tagline: "黑市芯片、违规法诀、明天的房租。",
+    motto: "天亮之前办完三件事",
+    art: "./src/assets/orgs/org-gang.png",
   },
 };
 
 export const CARD_LIBRARY = {
-  sweep_cut: cardData("sweep_cut", "扫尘斩", "attack", 1, { damage: 7 }, "造成 7 点伤害。", "zhou"),
+  sweep_cut: cardData("sweep_cut", "扫尘斩", "attack", 1, { damage: 7 }, "造成 7 点伤害。", "zhou", "./src/assets/cards/card-cleaner-sweep-px.png"),
   recycle_edge: cardData("recycle_edge", "回收刃", "attack", 1, { damage: 4, draw: 1 }, "造成 4 点伤害，抽 1 张牌。", "zhou"),
-  neon_backhand: cardData("neon_backhand", "霓刃回锋", "attack", 1, { damage: 5, block: 3 }, "造成 5 点伤害，获得 3 点护体。", "zhou"),
+  neon_backhand: cardData("neon_backhand", "霓刃回铲", "attack", 1, { damage: 5, block: 3 }, "造成 5 点伤害，获得 3 点护体。", "zhou"),
   clean_break: cardData("clean_break", "破网清算", "attack", 2, { damage: 13 }, "造成 13 点伤害。", "zhou"),
-  filter_guard: cardData("filter_guard", "滤阵护身", "skill", 1, { block: 7 }, "获得 7 点护体。", "zhou"),
+  filter_guard: cardData("filter_guard", "滤阵护身", "skill", 1, { block: 7 }, "获得 7 点护体。", "zhou", "./src/assets/cards/card-cleaner-block-px.png"),
   dust_step: cardData("dust_step", "尘步", "skill", 0, { block: 3 }, "获得 3 点护体。", "zhou"),
 
   overtime_claw: cardData("overtime_claw", "加班爪击", "attack", 1, { damage: 6, block: 2 }, "造成 6 点伤害，获得 2 点护体。", "ke"),
@@ -180,8 +192,8 @@ const ENCOUNTERS = [
   },
 ];
 
-function cardData(id, name, type, cost, effects, text, owner) {
-  return { id, name, type, cost, ...effects, text, owner };
+function cardData(id, name, type, cost, effects, text, owner, icon) {
+  return { id, name, type, cost, ...effects, text, owner, icon: icon || null };
 }
 
 export function createGame() {
@@ -190,6 +202,7 @@ export function createGame() {
     previousScreen: "splash",
     floor: 1,
     rewardChoices: [],
+    selectionStep: "character",
     pendingCharacter: null,
     pendingOrganization: null,
     player: null,
@@ -206,6 +219,7 @@ export function restartGame() {
 
 export function gotoSelect(game) {
   game.screen = "select";
+  game.selectionStep = "character";
   game.pendingCharacter = null;
   game.pendingOrganization = null;
 }
@@ -226,6 +240,17 @@ export function closeCodex(game) {
 export function pickPendingCharacter(game, characterId) {
   if (!CHARACTERS[characterId]) return;
   game.pendingCharacter = characterId;
+}
+
+export function confirmPendingCharacter(game) {
+  if (!game.pendingCharacter) return;
+  game.selectionStep = "organization";
+  game.pendingOrganization = null;
+}
+
+export function backToCharacterSelect(game) {
+  game.selectionStep = "character";
+  game.pendingOrganization = null;
 }
 
 export function pickPendingOrganization(game, organizationId) {
@@ -250,6 +275,8 @@ function startRun(game, characterId, organizationId) {
     avatar: character.avatar,
     idleStrip: character.idleStrip,
     idleFrames: character.idleFrames,
+    attackStrip: character.attackStrip,
+    attackFrames: character.attackFrames,
     organizationId: organization.id,
     organizationName: organization.name,
     organizationColor: organization.color,
@@ -308,7 +335,7 @@ export function playCard(game, handIndex) {
   game.player.hand.splice(handIndex, 1);
   applyCard(game, card);
   game.player.discardPile.push(cardId);
-  log(game, `施展「${card.name}」。`);
+  log(game, `施展《${card.name}》。`);
 
   if (game.enemy.hp <= 0) winCombat(game);
 }

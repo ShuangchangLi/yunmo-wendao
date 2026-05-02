@@ -85,7 +85,7 @@ func _show_splash() -> void:
 
 	var bg := TextureRect.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.texture = _load_texture("res://assets/homepage/cyber-longevity-home.png")
+	bg.texture = _load_texture("res://assets/homepage/home-bg-rd.png")
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	stage.add_child(bg)
@@ -265,27 +265,65 @@ func _character_card(class_id: String, data: Dictionary) -> PanelContainer:
 
 	return panel
 
-func _organization_card(org_id: String, data: Dictionary) -> PanelContainer:
+func _organization_card(org_id: String, data: Dictionary) -> Control:
 	var selected := org_id == pending_org
 	var color := Color(data["color"])
 	var border := Color("#ffe66d") if selected else color
-	var panel := PanelContainer.new()
-	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.custom_minimum_size = Vector2(0, 130)
-	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.025, 0.028, 0.075, 0.86), border, 0))
 
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 6)
-	panel.add_child(box)
-	box.add_child(_label(data["name"], 22, color))
-	var tag := _label(data["tagline"], 12, Color(0.86, 0.91, 1.0, 0.74))
+	var card := Control.new()
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card.custom_minimum_size = Vector2(0, 220)
+	card.clip_contents = true
+
+	var bg_image := _load_image(String(data.get("art", "")))
+	if bg_image != null:
+		var bg := TextureRect.new()
+		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+		bg.texture = ImageTexture.create_from_image(bg_image)
+		bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		bg.modulate = Color(1, 1, 1, 0.86)
+		card.add_child(bg)
+
+	var shade := ColorRect.new()
+	shade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	shade.color = Color(0.012, 0.02, 0.05, 0.62)
+	card.add_child(shade)
+
+	var bevel := PanelContainer.new()
+	bevel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bevel.add_theme_stylebox_override("panel", _panel_style(Color(0, 0, 0, 0), border, 0))
+	bevel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(bevel)
+
+	var content := VBoxContainer.new()
+	content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	content.add_theme_constant_override("margin_left", 14)
+	content.add_theme_constant_override("margin_top", 14)
+	content.add_theme_constant_override("margin_right", 14)
+	content.add_theme_constant_override("margin_bottom", 14)
+	content.alignment = BoxContainer.ALIGNMENT_END
+	content.add_theme_constant_override("separation", 5)
+	content.offset_left = 14
+	content.offset_top = 14
+	content.offset_right = -14
+	content.offset_bottom = -14
+	card.add_child(content)
+
+	content.add_child(_label(data["name"], 24, color))
+	if data.has("motto"):
+		content.add_child(_label(String(data["motto"]), 13, Color(1, 1, 1, 0.86)))
+	var tag := _label(data["tagline"], 12, Color(0.86, 0.91, 1.0, 0.78))
 	tag.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(tag)
-	box.add_child(_label("机制效果待解锁", 11, Color(0.95, 0.85, 0.4, 0.66)))
-	var btn := _button("选择" if not selected else "已选 ✓", Vector2(0, 32), Color("#16243a") if not selected else Color("#311340"), border)
+	content.add_child(tag)
+	content.add_child(_label("机制效果 · 待解锁", 11, Color(0.95, 0.85, 0.4, 0.66)))
+
+	var btn := _button("选择" if not selected else "已选 ✓", Vector2(0, 34), Color("#16243a") if not selected else Color("#311340"), border)
 	btn.pressed.connect(func(): _pick_organization(org_id))
-	box.add_child(btn)
-	return panel
+	content.add_child(btn)
+
+	return card
 
 func _select_summary_label() -> Label:
 	var text := ""
@@ -324,10 +362,40 @@ func _show_battle() -> void:
 	var root := _make_canvas(false)
 	root.add_child(_battle_topbar())
 
+	var stage_wrap := Control.new()
+	stage_wrap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stage_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	stage_wrap.clip_contents = true
+	root.add_child(stage_wrap)
+
+	var stage_bg_image := _load_image("res://assets/ui/combat-bg.png")
+	if stage_bg_image != null:
+		var stage_bg := TextureRect.new()
+		stage_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+		stage_bg.texture = ImageTexture.create_from_image(stage_bg_image)
+		stage_bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		stage_bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		stage_bg.modulate = Color(1, 1, 1, 0.78)
+		stage_wrap.add_child(stage_bg)
+	var stage_shade := ColorRect.new()
+	stage_shade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	stage_shade.color = Color(0.012, 0.018, 0.045, 0.4)
+	stage_wrap.add_child(stage_shade)
+
+	var stage_outline := PanelContainer.new()
+	stage_outline.set_anchors_preset(Control.PRESET_FULL_RECT)
+	stage_outline.add_theme_stylebox_override("panel", _panel_style(Color(0, 0, 0, 0), Color("#55f7ff", 0.42), 0))
+	stage_outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage_wrap.add_child(stage_outline)
+
 	var stage := HBoxContainer.new()
+	stage.set_anchors_preset(Control.PRESET_FULL_RECT)
 	stage.add_theme_constant_override("separation", 12)
-	stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	root.add_child(stage)
+	stage.offset_left = 14
+	stage.offset_top = 14
+	stage.offset_right = -14
+	stage.offset_bottom = -14
+	stage_wrap.add_child(stage)
 	stage.add_child(_combatant_panel(false))
 	stage.add_child(_stage_center())
 	stage.add_child(_combatant_panel(true))
@@ -690,6 +758,13 @@ func _card_button(card_id: String, hand_index: int, playable: bool) -> Button:
 	button.disabled = disabled
 	button.tooltip_text = card["text"]
 	button.add_theme_font_size_override("font_size", 13)
+	if card.has("icon") and String(card["icon"]) != "":
+		var icon_image := _load_image(String(card["icon"]))
+		if icon_image != null:
+			button.icon = ImageTexture.create_from_image(icon_image)
+			button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			button.expand_icon = true
+			button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
 	button.mouse_entered.connect(func(): _hover_card(button, true))
 	button.mouse_exited.connect(func(): _hover_card(button, false))
 	if playable:
@@ -853,18 +928,18 @@ func _card_kind_label(t: String) -> String:
 
 func _unit_art_path(visual: String) -> String:
 	var paths := {
-		"cleaner": "res://assets/pixel/px-cleaner.png",
+		"cleaner": "res://assets/portraits/cleaner-headshot.png",
 		"worker": "res://assets/pixel/px-worker.png",
 		"streamer": "res://assets/pixel/px-streamer.png",
 		"neon_hound": "res://assets/pixel/px-enemy-neon-hound.png",
 		"iron_boar": "res://assets/pixel/px-enemy-iron-boar.png",
 		"alley_raider": "res://assets/pixel/px-enemy-alley-raider.png"
 	}
-	return paths.get(visual, "res://assets/pixel/px-cleaner.png")
+	return paths.get(visual, "res://assets/portraits/cleaner-headshot.png")
 
 func _unit_idle_strip_path(visual: String) -> String:
 	var paths := {
-		"cleaner": "res://assets/pixel/px-cleaner-idle-strip.png",
+		"cleaner": "res://assets/rd/cleaner-combat-idle-strip.png",
 		"worker": "res://assets/pixel/px-worker-idle-strip.png",
 		"streamer": "res://assets/pixel/px-streamer-idle-strip.png",
 		"neon_hound": "res://assets/pixel/px-enemy-neon-hound-idle-strip.png",

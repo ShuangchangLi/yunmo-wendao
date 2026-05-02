@@ -5,10 +5,11 @@ import {
   ORGANIZATIONS,
   GAME_TITLE,
   GAME_SUBTITLE,
-  GAME_TAGLINE,
   KEYWORDS,
   addRewardCard,
+  backToCharacterSelect,
   closeCodex,
+  confirmPendingCharacter,
   confirmSelection,
   createGame,
   endTurn,
@@ -17,7 +18,6 @@ import {
   pickPendingCharacter,
   pickPendingOrganization,
   playCard,
-  restartGame,
   showCodex,
   skipReward,
 } from "./game.js";
@@ -42,6 +42,11 @@ function bindSprites() {
   app.querySelectorAll("[data-strip]").forEach((el) => {
     const strip = el.dataset.strip;
     const frames = Math.max(1, Number(el.dataset.frames) || 1);
+    const frameMs = Math.max(80, Number(el.dataset.frameMs) || SPRITE_FRAME_MS);
+    const sequence = (el.dataset.sequence || "")
+      .split(",")
+      .map((value) => Number(value.trim()))
+      .filter((value) => Number.isInteger(value) && value >= 0 && value < frames);
     if (!strip) return;
     el.style.backgroundImage = `url("${strip}")`;
     el.style.backgroundRepeat = "no-repeat";
@@ -50,17 +55,25 @@ function bindSprites() {
     if (frames <= 1) return;
     let i = 0;
     const advance = () => {
+      if (sequence.length) {
+        i = (i + 1) % sequence.length;
+        const frameIndex = sequence[i];
+        el.style.backgroundPosition = `${(frameIndex / (frames - 1)) * 100}% 0%`;
+        return;
+      }
       i = (i + 1) % frames;
       el.style.backgroundPosition = `${(i / (frames - 1)) * 100}% 0%`;
     };
-    spriteTimers.push(setInterval(advance, SPRITE_FRAME_MS));
+    spriteTimers.push(setInterval(advance, frameMs));
   });
 }
 
-function spriteAttrs(strip, frames, fallback) {
+function spriteAttrs(strip, frames, fallback, options = {}) {
   const useStrip = strip || fallback;
   const count = strip ? Math.max(1, Number(frames) || 1) : 1;
-  return ` data-strip="${useStrip}" data-frames="${count}"`;
+  const frameMs = options.frameMs ? ` data-frame-ms="${options.frameMs}"` : "";
+  const sequence = options.sequence ? ` data-sequence="${options.sequence}"` : "";
+  return ` data-strip="${useStrip}" data-frames="${count}"${frameMs}${sequence}`;
 }
 
 function renderScreen() {
@@ -78,76 +91,87 @@ function renderSplash() {
   return `
     <section class="splash splash-home" aria-label="${GAME_TITLE} ${GAME_SUBTITLE}">
       <div class="home-bg" aria-hidden="true"></div>
+      <div class="home-atmosphere" aria-hidden="true"></div>
 
-      <aside class="home-panel cultivation-panel" aria-label="修仙进度">
-        <div class="meditate-icon">♟</div>
-        <div>
-          <p>修仙进度</p>
-          <strong>炼气三层</strong>
-          <span>230/1000</span>
-          <div class="progress-dots"><i></i><i></i><i></i><i></i><b></b><b></b><b></b><b></b><b></b><b></b></div>
-        </div>
-      </aside>
-
-      <aside class="home-panel insight-panel" aria-label="今日悟道">
-        <p>今日悟道</p>
-        <ul>
-          <li><span>灵气 +1</span><em>▲</em></li>
-          <li><span>KPI +1</span><em>▲</em></li>
-          <li class="bad"><span>寿命 -1</span><em>▼</em></li>
-        </ul>
-        <div class="signal-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      </aside>
-
-      <nav class="home-side-nav" aria-label="主页快捷入口">
-        <button type="button" data-action="open-codex"><span>⌘</span><em>功法</em></button>
-        <button type="button" data-action="open-codex"><span>▣</span><em>卡牌</em></button>
-        <button type="button"><span>◇</span><em>道具</em></button>
-        <button type="button"><span>⚙</span><em>系统</em></button>
-      </nav>
-
-      <div class="home-primary-actions" aria-label="主要操作">
-        <button class="home-main-cta" data-action="goto-select">打工修仙录</button>
-        <button class="home-continue" data-action="continue" ${hasSave ? "" : "disabled"}>继续存档</button>
-      </div>
-
-      <button class="home-vertical-cta" data-action="goto-select" aria-label="加班炼体">加班<br />炼体</button>
-
-      <footer class="home-dock" aria-label="底部菜单">
-        <button type="button" data-action="goto-select"><span>⚔</span><em>战斗</em></button>
-        <button type="button" data-action="open-codex"><span>▧</span><em>卡牌</em></button>
-        <button type="button" data-action="goto-select"><span>♟</span><em>修炼</em></button>
-        <button type="button"><span>▤</span><em>商店</em></button>
-        <button type="button"><span>▥</span><em>地图</em></button>
-        <button type="button"><span>⚙</span><em>设置</em></button>
-      </footer>
-
-      <p class="home-player-id">修仙ID：0019527</p>
+      <main class="home-menu-shell">
+        <img class="home-title-img" src="./src/assets/homepage/title-rd-transparent.png" alt="${GAME_TITLE} ${GAME_SUBTITLE}" />
+        <nav class="home-menu-panel" aria-label="主菜单">
+          <button class="home-menu-btn primary" data-action="goto-select">开始修行</button>
+          <button class="home-menu-btn" data-action="continue" ${hasSave ? "" : "disabled"}>继续存档</button>
+          <button class="home-menu-btn" data-action="open-codex">天机档案</button>
+        </nav>
+      </main>
     </section>
   `;
 }
 
 function renderSelect() {
+  const focusedCharacter = game.pendingCharacter ? CHARACTERS[game.pendingCharacter] : CHARACTERS.zhou;
   const character = game.pendingCharacter ? CHARACTERS[game.pendingCharacter] : null;
   const organization = game.pendingOrganization ? ORGANIZATIONS[game.pendingOrganization] : null;
   const ready = Boolean(character && organization);
+  if (game.selectionStep !== "organization" || !character) return renderCharacterSelect(focusedCharacter);
+  return renderOrganizationSelect(character, organization, ready);
+}
+
+function renderCharacterSelect(focusedCharacter) {
+  const sceneArt = focusedCharacter.selectArt || focusedCharacter.avatar;
   return `
-    <section class="select">
+    <section class="select select-character">
       <header class="select-head">
         <button class="ghost" data-action="goto-splash">‹ 返回</button>
-        <h1>挑一个普通人，挂上一个组织</h1>
+        <h1>选择入城身份</h1>
         <button class="ghost" data-action="open-codex">天机档案</button>
       </header>
 
-      <section class="select-section">
-        <h2>选择你的人物</h2>
-        <div class="select-grid characters">
-          ${Object.values(CHARACTERS).map((c) => renderCharacterCard(c, c.id === game.pendingCharacter)).join("")}
+      <section class="character-focus">
+        <img class="character-focus-art" src="${sceneArt}" alt="" />
+        <div class="character-focus-shade"></div>
+        <div class="character-focus-info">
+          <p class="seal">入门身份</p>
+          <h2>${focusedCharacter.name}<span>${focusedCharacter.profession}</span></h2>
+          <p class="focus-tagline">${focusedCharacter.tagline}</p>
+          <dl class="char-info-grid">
+            <div><dt>气血</dt><dd>${focusedCharacter.maxHp}</dd></div>
+            <div><dt>能量</dt><dd>3</dd></div>
+            <div class="span-2"><dt>${focusedCharacter.passive.name}</dt><dd>${focusedCharacter.passive.text}</dd></div>
+          </dl>
+          <button class="primary big focus-confirm" data-action="confirm-character" data-character="${focusedCharacter.id}">选择 ${focusedCharacter.name} ›</button>
         </div>
+        <nav class="character-thumbs" aria-label="角色列表">
+          ${Object.values(CHARACTERS).map((c) => renderCharacterThumb(c, c.id === focusedCharacter.id)).join("")}
+        </nav>
       </section>
+    </section>
+  `;
+}
 
-      <section class="select-section">
-        <h2>选择你隶属的组织</h2>
+function renderOrganizationSelect(character, organization, ready) {
+  return `
+    <section class="select select-organization">
+      <header class="select-head">
+        <button class="ghost" data-action="back-character-select">‹ 重选人物</button>
+        <h1>选择隶属组织</h1>
+        <button class="ghost" data-action="open-codex">天机档案</button>
+      </header>
+
+      <section class="org-select-layout">
+        <aside class="selected-character-panel cyber-panel">
+          <div class="selected-character-art role-art-anim"${spriteAttrs(character.selectStrip || character.idleStrip, character.selectFrames || character.idleFrames, character.avatar, { frameMs: character.selectFrameMs, sequence: character.selectSequence })}></div>
+          <div class="selected-character-info">
+            <p class="seal">已选择</p>
+            <h2>${character.name}<span>${character.profession}</span></h2>
+            <p>${character.tagline}</p>
+            <div class="char-stat-row">
+              <span>气血 <strong>${character.maxHp}</strong></span>
+              <span>能量 <strong>3</strong></span>
+            </div>
+            <div class="char-passive">
+              <em>${character.passive.name}</em>
+              <span>${character.passive.text}</span>
+            </div>
+          </div>
+        </aside>
         <div class="select-grid organizations">
           ${Object.values(ORGANIZATIONS).map((o) => renderOrganizationCard(o, o.id === game.pendingOrganization)).join("")}
         </div>
@@ -155,13 +179,22 @@ function renderSelect() {
 
       <footer class="select-foot">
         <p class="select-summary">
-          ${character ? `<strong>${character.name}</strong> · ${character.profession}` : "<em>请先选择人物</em>"}
-          ${character && organization ? " · " : ""}
-          ${organization ? `<strong style="color:${organization.color}">${organization.name}</strong>` : (character ? "<em>再挑一个组织</em>" : "")}
+          <strong>${character.name}</strong> · ${character.profession}
+          ${organization ? ` · <strong style="color:${organization.color}">${organization.name}</strong>` : " · <em>再挑一个组织</em>"}
         </p>
-        <button class="primary big" data-action="confirm-selection" ${ready ? "" : "disabled"}>进入夜巡</button>
+        <button class="primary big" data-action="confirm-selection" ${ready ? "" : "disabled"}>进入夜巡 ›</button>
       </footer>
     </section>
+  `;
+}
+
+function renderCharacterThumb(character, active) {
+  const portrait = character.selectPortrait || character.avatar;
+  return `
+    <button class="character-thumb ${active ? "active" : ""}" data-action="pick-character" data-character="${character.id}" aria-pressed="${active}">
+      <img class="thumb-art" src="${portrait}" alt="${character.name}" loading="lazy" />
+      <strong>${character.name}</strong>
+    </button>
   `;
 }
 
@@ -189,11 +222,17 @@ function renderCharacterCard(character, selected) {
 }
 
 function renderOrganizationCard(org, selected) {
+  const art = org.art ? `<img class="org-art" src="${org.art}" alt="" loading="lazy" />` : "";
   return `
     <button class="org-card ${selected ? "selected" : ""}" data-action="pick-organization" data-organization="${org.id}" style="--accent:${org.color}">
-      <strong>${org.name}</strong>
-      <p>${org.tagline}</p>
-      <span class="org-tag">机制效果待解锁</span>
+      ${art}
+      <div class="org-shade"></div>
+      <div class="org-card-body">
+        <strong>${org.name}</strong>
+        <em class="org-motto">${org.motto || ""}</em>
+        <p>${org.tagline}</p>
+        <span class="org-tag">机制效果 · 待解锁</span>
+      </div>
     </button>
   `;
 }
@@ -412,6 +451,7 @@ function cardButton(cardId, mode, index = 0) {
 }
 
 function cardIcon(card) {
+  if (card.icon) return card.icon;
   if (card.owner === "zhou") {
     return card.type === "attack" ? "./src/assets/pixel/card-cleaner-attack.png" : "./src/assets/pixel/card-cleaner-skill.png";
   }
@@ -427,7 +467,7 @@ function cardIcon(card) {
 function intentIcon(intent) {
   if (intent === "attack") return "杀";
   if (intent === "block") return "守";
-  return "频";
+  return "势";
 }
 
 function intentLabel(intent) {
@@ -443,6 +483,11 @@ function bindEvents() {
       let shouldSave = true;
 
       if (action === "pick-character") pickPendingCharacter(game, element.dataset.character);
+      if (action === "confirm-character") {
+        pickPendingCharacter(game, element.dataset.character);
+        confirmPendingCharacter(game);
+      }
+      if (action === "back-character-select") backToCharacterSelect(game);
       if (action === "pick-organization") pickPendingOrganization(game, element.dataset.organization);
       if (action === "confirm-selection") confirmSelection(game);
       if (action === "play-card") playCard(game, Number(element.dataset.index));

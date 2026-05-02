@@ -2,16 +2,22 @@
   "corp": {
     "name": "天机科技",
     "color": "#55f7ff",
-    "tagline": "亚洲最大的灵网基础设施商。机会都摆在那里。"
+    "tagline": "亚洲最大的灵网基础设施商。机会都摆在那里，代价也一样。",
+    "motto": "网在你身上，门在我手里",
+    "art": "res://assets/orgs/org-corp.png"
   },
   "academy": {
     "name": "太上学院",
     "color": "#ffe36f",
-    "tagline": "最后一个有「合法师承」的地方。从前学剑，现在学气脉编程。"
+    "tagline": "最后一个有合法师承的地方。从前学剑，现在学气脉编程。",
+    "motto": "传承可编译，剑意能开源",
+    "art": "res://assets/orgs/org-academy.png"
   },
   "gang": {
     "name": "夜行帮",
     "color": "#ff53d5",
-    "tagline": "黑市芯片、违规法诀、明天的房租。"
+    "tagline": "黑市芯片、违规法诀、明天的房租。",
+    "motto": "天亮之前办完三件事",
+    "art": "res://assets/orgs/org-gang.png"
   }
 }

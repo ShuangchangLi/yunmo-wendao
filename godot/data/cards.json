@@ -5,7 +5,8 @@
     "cost": 1,
     "text": "造成 7 点伤害。",
     "damage": 7,
-    "owner": "zhou"
+    "owner": "zhou",
+    "icon": "res://assets/cards/card-cleaner-sweep-px.png"
   },
   "recycle_edge": {
     "name": "回收刃",
@@ -39,7 +40,8 @@
     "cost": 1,
     "text": "获得 7 点护体。",
     "block": 7,
-    "owner": "zhou"
+    "owner": "zhou",
+    "icon": "res://assets/cards/card-cleaner-block-px.png"
   },
   "dust_step": {
     "name": "尘步",
