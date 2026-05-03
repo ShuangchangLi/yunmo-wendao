@@ -17,7 +17,9 @@ export const CHARACTERS = {
     profession: "清洁工",
     visual: "cleaner",
     avatar: "./src/assets/portraits/cleaner-headshot.png",
-    selectArt: "./src/assets/portraits/cleaner-scene.png",
+    referenceArt: "./src/assets/portraits/cleaner-base.png",
+    organizationArt: "./src/assets/portraits/cleaner-base.png",
+    selectArt: "./src/assets/portraits/cleaner-scene-highres.png",
     selectPortrait: "./src/assets/portraits/cleaner-headshot.png",
     selectStrip: null,
     selectFrames: 1,
@@ -119,11 +121,17 @@ export const ORGANIZATIONS = {
 };
 
 export const CARD_LIBRARY = {
-  sweep_cut: cardData("sweep_cut", "扫尘斩", "attack", 1, { damage: 7 }, "造成 7 点伤害。", "zhou", "./src/assets/cards/card-cleaner-sweep-px.png"),
+  sweep_cut: cardData("sweep_cut", "扫", "attack", 1, { damage: 7 }, "造成 7 点伤害。", "zhou", {
+    icon: "./src/assets/cards/card-cleaner-sweep-px.png",
+    fullArt: "./src/assets/cards/card-cleaner-sweep-full-transparent.png",
+  }),
   recycle_edge: cardData("recycle_edge", "回收刃", "attack", 1, { damage: 4, draw: 1 }, "造成 4 点伤害，抽 1 张牌。", "zhou"),
   neon_backhand: cardData("neon_backhand", "霓刃回铲", "attack", 1, { damage: 5, block: 3 }, "造成 5 点伤害，获得 3 点护体。", "zhou"),
   clean_break: cardData("clean_break", "破网清算", "attack", 2, { damage: 13 }, "造成 13 点伤害。", "zhou"),
-  filter_guard: cardData("filter_guard", "滤阵护身", "skill", 1, { block: 7 }, "获得 7 点护体。", "zhou", "./src/assets/cards/card-cleaner-block-px.png"),
+  filter_guard: cardData("filter_guard", "挡", "skill", 1, { block: 7 }, "获得 7 点护体。", "zhou", {
+    icon: "./src/assets/cards/card-cleaner-block-px.png",
+    fullArt: "./src/assets/cards/card-cleaner-block-full-transparent.png",
+  }),
   dust_step: cardData("dust_step", "尘步", "skill", 0, { block: 3 }, "获得 3 点护体。", "zhou"),
 
   overtime_claw: cardData("overtime_claw", "加班爪击", "attack", 1, { damage: 6, block: 2 }, "造成 6 点伤害，获得 2 点护体。", "ke"),
@@ -192,8 +200,19 @@ const ENCOUNTERS = [
   },
 ];
 
-function cardData(id, name, type, cost, effects, text, owner, icon) {
-  return { id, name, type, cost, ...effects, text, owner, icon: icon || null };
+function cardData(id, name, type, cost, effects, text, owner, art = {}) {
+  const normalizedArt = typeof art === "string" ? { icon: art } : art;
+  return {
+    id,
+    name,
+    type,
+    cost,
+    ...effects,
+    text,
+    owner,
+    icon: normalizedArt.icon || null,
+    fullArt: normalizedArt.fullArt || null,
+  };
 }
 
 export function createGame() {

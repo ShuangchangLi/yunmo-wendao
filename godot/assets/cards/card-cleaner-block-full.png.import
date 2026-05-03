@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://djdoncwv2euxy"
-path="res://.godot/imported/unit-alley-raider.png-41a23b5778f9dcf774db946a0971e333.ctex"
+uid="uid://bvlkja3b6q3jg"
+path="res://.godot/imported/card-cleaner-block-full.png-0ed73cf28c707e1b0c1c21b64e34a703.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/generated/unit-alley-raider.png"
-dest_files=["res://.godot/imported/unit-alley-raider.png-41a23b5778f9dcf774db946a0971e333.ctex"]
+source_file="res://assets/cards/card-cleaner-block-full.png"
+dest_files=["res://.godot/imported/card-cleaner-block-full.png-0ed73cf28c707e1b0c1c21b64e34a703.ctex"]
 
 [params]
 

@@ -1,12 +1,13 @@
 {
   "sweep_cut": {
-    "name": "扫尘斩",
+    "name": "扫",
     "type": "attack",
     "cost": 1,
     "text": "造成 7 点伤害。",
     "damage": 7,
     "owner": "zhou",
-    "icon": "res://assets/cards/card-cleaner-sweep-px.png"
+    "icon": "res://assets/cards/card-cleaner-sweep-px.png",
+    "full_art": "res://assets/cards/card-cleaner-sweep-full.png"
   },
   "recycle_edge": {
     "name": "回收刃",
@@ -35,13 +36,14 @@
     "owner": "zhou"
   },
   "filter_guard": {
-    "name": "滤阵护身",
+    "name": "挡",
     "type": "skill",
     "cost": 1,
     "text": "获得 7 点护体。",
     "block": 7,
     "owner": "zhou",
-    "icon": "res://assets/cards/card-cleaner-block-px.png"
+    "icon": "res://assets/cards/card-cleaner-block-px.png",
+    "full_art": "res://assets/cards/card-cleaner-block-full.png"
   },
   "dust_step": {
     "name": "尘步",

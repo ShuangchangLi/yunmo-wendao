@@ -26,7 +26,7 @@ node tools/retro_diffusion_client.mjs generate --prompt "cyber xianxia janitor h
 For animation from a starting frame:
 
 ```powershell
-node tools/retro_diffusion_client.mjs animate --input src/assets/pixel/px-cleaner.png --prompt "slow breathing combat idle, holding a mop like a staff, subtle cloth movement" --style rd_advanced_animation__idle --width 128 --height 128 --frames 8 --spritesheet --out tmp/rd/cleaner-combat-idle.png
+node tools/retro_diffusion_client.mjs animate --input src/assets/portraits/cleaner-headshot.png --prompt "slow breathing combat idle, holding a mop like a staff, subtle cloth movement" --style rd_advanced_animation__idle --width 128 --height 128 --frames 8 --spritesheet --out tmp/rd/cleaner-combat-idle.png
 ```
 
 ## Styles that matter for this game

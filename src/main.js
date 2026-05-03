@@ -157,7 +157,7 @@ function renderOrganizationSelect(character, organization, ready) {
 
       <section class="org-select-layout">
         <aside class="selected-character-panel cyber-panel">
-          <div class="selected-character-art role-art-anim"${spriteAttrs(character.selectStrip || character.idleStrip, character.selectFrames || character.idleFrames, character.avatar, { frameMs: character.selectFrameMs, sequence: character.selectSequence })}></div>
+          ${renderSelectedCharacterArt(character)}
           <div class="selected-character-info">
             <p class="seal">已选择</p>
             <h2>${character.name}<span>${character.profession}</span></h2>
@@ -186,6 +186,17 @@ function renderOrganizationSelect(character, organization, ready) {
       </footer>
     </section>
   `;
+}
+
+function renderSelectedCharacterArt(character) {
+  if (character.organizationArt) {
+    return `<img class="selected-character-art selected-character-img" src="${character.organizationArt}" alt="${character.name}" loading="lazy" />`;
+  }
+  if (character.idleStrip) {
+    return `<div class="selected-character-art role-art-anim"${spriteAttrs(character.idleStrip, character.idleFrames, character.avatar, { frameMs: character.idleFrameMs, sequence: character.idleSequence })}></div>`;
+  }
+  const portrait = character.selectPortrait || character.avatar;
+  return `<img class="selected-character-art selected-character-img" src="${portrait}" alt="${character.name}" loading="lazy" />`;
 }
 
 function renderCharacterThumb(character, active) {
@@ -439,15 +450,27 @@ function cardButton(cardId, mode, index = 0) {
   const card = CARD_LIBRARY[cardId];
   const disabled = mode === "play" && game.player && game.player.energy < card.cost ? "disabled" : "";
   const action = mode === "play" ? "play-card" : mode === "reward" ? "choose-reward" : "noop";
-  return `
-    <button class="card ${card.type} owner-${card.owner}" data-action="${action}" data-card="${cardId}" data-index="${index}" ${disabled}>
+  const face = cardFullArt(card);
+  const content = face
+    ? `
+      <img class="card-face" src="${face}" alt="" decoding="async" />
+      <span class="sr-only">${card.name}: ${card.text}</span>
+    `
+    : `
       <span class="cost">${card.cost}</span>
-      <span class="kind">${card.type === "attack" ? "攻击" : "技能"}</span>
-      <img class="card-art" src="${cardIcon(card)}" alt="" />
       <strong>${card.name}</strong>
+      <span class="kind">${card.type === "attack" ? "攻击" : "技能"}</span>
       <p>${card.text}</p>
+    `;
+  return `
+    <button class="card ${card.type} owner-${card.owner} ${face ? "image-card" : ""}" data-action="${action}" data-card="${cardId}" data-index="${index}" aria-label="${card.name}: ${card.text}" ${disabled}>
+      ${content}
     </button>
   `;
+}
+
+function cardFullArt(card) {
+  return card.fullArt || null;
 }
 
 function cardIcon(card) {

@@ -63,10 +63,10 @@
 3. **拼图 + 拷贝**（自动）：
 
    ```powershell
-   # 写到 godot 然后镜像到 src
-   py tools/process_pixellab_character.py tmp/pixellab-zips/cleaner.zip godot/assets/pixel px-cleaner
-   Copy-Item godot/assets/pixel/px-cleaner.png src/assets/pixel/px-cleaner.png -Force
-   Copy-Item godot/assets/pixel/px-cleaner-idle-strip.png src/assets/pixel/px-cleaner-idle-strip.png -Force
+   # Pixellab 旧角色流程示例。当前 cleaner 已改用 Retro Diffusion / portraits + rd strips。
+   py tools/process_pixellab_character.py tmp/pixellab-zips/worker.zip godot/assets/pixel px-worker
+   Copy-Item godot/assets/pixel/px-worker.png src/assets/pixel/px-worker.png -Force
+   Copy-Item godot/assets/pixel/px-worker-idle-strip.png src/assets/pixel/px-worker-idle-strip.png -Force
    ```
 
    脚本会输出 `{prefix}.png`（south 静态）和 `{prefix}-idle-strip.png`（拼好的横条）。

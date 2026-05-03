@@ -2,16 +2,12 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://djdoncwv2euxy"
-path="res://.godot/imported/unit-alley-raider.png-41a23b5778f9dcf774db946a0971e333.ctex"
-metadata={
-"vram_texture": false
-}
+uid="uid://bbw1b1djsnet"
+valid=false
 
 [deps]
 
-source_file="res://assets/generated/unit-alley-raider.png"
-dest_files=["res://.godot/imported/unit-alley-raider.png-41a23b5778f9dcf774db946a0971e333.ctex"]
+source_file="res://assets/portraits/cleaner-scene.png"
 
 [params]
 

@@ -87,7 +87,7 @@ async function main() {
   node tools/retro_diffusion_client.mjs credits
   node tools/retro_diffusion_client.mjs cost --prompt "..." --style rd_pro__default --width 256 --height 256
   node tools/retro_diffusion_client.mjs generate --prompt "..." --style rd_pro__spritesheet --width 256 --height 256 --out tmp/rd/out.png
-  node tools/retro_diffusion_client.mjs animate --input src/assets/pixel/px-cleaner.png --prompt "slow breathing idle" --style rd_advanced_animation__idle --width 128 --height 128 --frames 8 --spritesheet --out tmp/rd/cleaner-idle.png
+  node tools/retro_diffusion_client.mjs animate --input src/assets/portraits/cleaner-headshot.png --prompt "slow breathing idle" --style rd_advanced_animation__idle --width 128 --height 128 --frames 8 --spritesheet --out tmp/rd/cleaner-idle.png
 `);
     return;
   }
