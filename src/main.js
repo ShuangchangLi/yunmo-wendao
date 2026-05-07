@@ -1,6 +1,8 @@
 import {
   ACT_LENGTH,
+  ASCENSIONS,
   CARD_LIBRARY,
+  CHAPTER,
   CHARACTERS,
   ORGANIZATIONS,
   GAME_TITLE,
@@ -8,6 +10,7 @@ import {
   KEYWORDS,
   addRewardCard,
   backToCharacterSelect,
+  chooseAscension,
   closeCodex,
   confirmPendingCharacter,
   confirmSelection,
@@ -23,17 +26,22 @@ import {
 } from "./game.js";
 
 const SAVE_KEY = "cyber-longevity-save";
+const SAVE_VERSION = 2;
 const SPRITE_FRAME_MS = 160;
 
 let game = createGame();
 let logOpen = false;
 let spriteTimers = [];
+let fxTimer = null;
+let audio = null;
+let bgmTimer = null;
 const app = document.querySelector("#app");
 
 function render() {
   app.innerHTML = renderScreen();
   bindEvents();
   bindSprites();
+  scheduleFxClear();
 }
 
 function bindSprites() {
@@ -81,6 +89,7 @@ function renderScreen() {
   if (game.screen === "splash") return renderSplash();
   if (game.screen === "select") return renderSelect();
   if (game.screen === "defeat") return renderDefeat();
+  if (game.screen === "ascend") return renderAscension();
   if (game.screen === "reward") return renderReward();
   if (game.screen === "complete") return renderComplete();
   return renderCombat();
@@ -256,9 +265,10 @@ function renderCombat() {
       <header class="combat-bar">
         <button class="ghost slim" data-action="goto-splash">‹ 退出</button>
         <div class="combat-progress">
-          <span class="eyebrow">第 ${game.floor} / ${ACT_LENGTH} 战</span>
-          <strong>${game.player.name}<em>· ${game.player.profession}</em></strong>
+          <span class="eyebrow">${CHAPTER.name} · 第 ${game.floor} / ${ACT_LENGTH} 战</span>
+          <strong>${game.player.name}<em>· ${game.player.rankName || game.player.profession}</em></strong>
           <span class="org-chip" style="--accent:${orgColor}">${game.player.organizationName}</span>
+          <span class="org-chip soft">战利品 ${game.player.credits || 0}</span>
         </div>
         <div class="combat-bar-actions">
           <button class="ghost slim" data-action="open-codex">档案</button>
@@ -266,7 +276,7 @@ function renderCombat() {
         </div>
       </header>
 
-      <section class="stage">
+      <section class="stage ${stageFxClass()}">
         ${renderCombatant("player", character)}
         <div class="stage-center">
           <div class="stage-vfx">
@@ -274,6 +284,7 @@ function renderCombat() {
             <p class="stage-hint">${stageHint()}</p>
           </div>
         </div>
+        ${renderCardVfxLayer()}
         ${renderCombatant("enemy")}
       </section>
 
@@ -293,13 +304,46 @@ function renderCombat() {
   `;
 }
 
+function stageFxClass() {
+  if (!game.fx) return "";
+  const card = activeFxCard();
+  const classes = [`fx-${game.fx.kind}`];
+  if (card?.vfx?.kind) classes.push(`vfx-${card.vfx.kind}`, `card-${card.id}`);
+  return classes.join(" ");
+}
+
 function stageHint() {
+  const card = activeFxCard();
+  if (card?.vfx?.description) return `《${card.name}》：${card.vfx.description}`;
   const move = game.enemy?.nextMove;
   if (!move) return "夜巡频道开始记录。";
-  if (move.intent === "attack") return `${game.enemy.name} 准备出招。`;
+  if (move.intent === "attack") {
+    const hits = move.hits && move.hits > 1 ? ` ×${move.hits}` : "";
+    return `${game.enemy.name} 准备出招：${move.amount + (game.enemy.strength || 0)}${hits}。`;
+  }
   if (move.intent === "block") return `${game.enemy.name} 凝起护体。`;
   if (move.intent === "buff") return `${game.enemy.name} 蓄势变强。`;
+  if (move.intent === "debuff") return `${game.enemy.name} 正在扬起灵污。`;
   return "对峙中。";
+}
+
+function activeFxCard() {
+  if (!game.fx?.source) return null;
+  return CARD_LIBRARY[game.fx.source] || null;
+}
+
+function renderCardVfxLayer() {
+  const card = activeFxCard();
+  if (!card?.vfx) return "";
+  const vfx = card.vfx;
+  return `
+    <div class="card-vfx-layer ${vfx.kind}" aria-hidden="true">
+      <span class="vfx-title">${vfx.label || card.name}</span>
+      <i class="vfx-core"></i>
+      <i class="vfx-trail"></i>
+      <i class="vfx-particles"></i>
+    </div>
+  `;
 }
 
 function renderCombatant(side, characterIfPlayer) {
@@ -307,11 +351,13 @@ function renderCombatant(side, characterIfPlayer) {
   const unit = isEnemy ? game.enemy : game.player;
   const hpMax = unit.maxHp;
   const hp = unit.hp;
-  const profession = isEnemy ? unit.title : characterIfPlayer.profession;
+  const profession = isEnemy ? unit.title : unit.rankName || characterIfPlayer.profession;
+  const art = combatantArt(unit, isEnemy);
   return `
-    <article class="combatant-v3 ${side}">
+    <article class="combatant-v3 ${side} ${combatantFxClass(side)} ${combatantPersonalityClass(unit, isEnemy)}">
       <div class="portrait">
-        <div class="portrait-art role-art-anim"${spriteAttrs(unit.idleStrip, unit.idleFrames, isEnemy ? unit.art : unit.avatar)} aria-label="${unit.name}"></div>
+        <div class="portrait-art role-art-anim"${spriteAttrs(art.strip, art.frames, art.fallback, { frameMs: art.frameMs })} aria-label="${unit.name}"></div>
+        ${isEnemy ? `<div class="enemy-expression ${enemyExpressionClass(unit)}" aria-hidden="true"><i></i><b></b></div>` : ""}
         ${isEnemy ? renderIntent() : ""}
       </div>
       <p class="unit-tag">${profession}</p>
@@ -328,21 +374,62 @@ function renderCombatant(side, characterIfPlayer) {
       </div>
       <div class="status-pips">
         ${unit.burn > 0 ? `<span class="pip burn">灼痕 ${unit.burn}</span>` : ""}
+        ${unit.dust > 0 ? `<span class="pip dust">灵污 ${unit.dust}</span>` : ""}
         ${isEnemy && unit.strength > 0 ? `<span class="pip buff">攻势 +${unit.strength}</span>` : ""}
       </div>
     </article>
   `;
 }
 
+function combatantArt(unit, isEnemy) {
+  const card = activeFxCard();
+  const isPlayerAttack = !isEnemy && game.fx?.actor === "player" && card?.vfx?.stance === "attack" && unit.attackStrip;
+  if (isPlayerAttack) {
+    return {
+      strip: unit.attackStrip,
+      frames: unit.attackFrames || 1,
+      fallback: unit.avatar,
+      frameMs: 90,
+    };
+  }
+  return {
+    strip: unit.idleStrip,
+    frames: unit.idleFrames || 1,
+    fallback: isEnemy ? unit.art : unit.avatar,
+    frameMs: null,
+  };
+}
+
+function combatantPersonalityClass(unit, isEnemy) {
+  if (!isEnemy) return "";
+  return `enemy-${unit.faction || "neutral"} enemy-${unit.type || "normal"} unit-${unit.id || "unknown"}`;
+}
+
+function enemyExpressionClass(unit) {
+  if (unit.faction === "corp") return "face-alert";
+  if (unit.faction === "academy") return "face-proud";
+  if (unit.faction === "gang") return "face-smirk";
+  return "face-alert";
+}
+
+function combatantFxClass(side) {
+  if (!game.fx) return "";
+  const classes = [];
+  if (game.fx.actor === side) classes.push(`is-actor fx-${game.fx.kind}`);
+  if (game.fx.target === side) classes.push(`is-target fx-${game.fx.kind}`);
+  return classes.join(" ");
+}
+
 function renderIntent() {
   const move = game.enemy.nextMove;
   if (!move) return "";
   const amount = move.amount + (move.intent === "attack" ? game.enemy.strength : 0);
+  const suffix = move.intent === "attack" && move.hits && move.hits > 1 ? ` ×${move.hits}` : "";
   return `
     <div class="intent-bubble ${move.intent}">
       <span class="intent-icon">${intentIcon(move.intent)}</span>
       <strong>${move.label}</strong>
-      <small>${intentLabel(move.intent)} ${amount}</small>
+      <small>${intentLabel(move.intent)} ${amount}${suffix}</small>
     </div>
   `;
 }
@@ -356,6 +443,35 @@ function renderLogDrawer() {
         ${game.log.map((entry) => `<p>${entry}</p>`).join("")}
       </div>
     </aside>
+  `;
+}
+
+function renderAscension() {
+  const choices = game.ascensionChoices || [];
+  const character = CHARACTERS[game.player.characterId];
+  return `
+    <section class="ascend panel">
+      <div class="ascend-header">
+        <p class="seal">转职节点</p>
+        <h1>${character.name} 的夜巡报告</h1>
+        <p class="muted">你已经撑过第 ${game.floor} 战。选择一条路线，它会永久改变清洁工第一章的打法。</p>
+      </div>
+      <div class="ascension-grid">
+        ${choices.map((id) => renderAscensionCard(ASCENSIONS[id])).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderAscensionCard(choice) {
+  if (!choice) return "";
+  return `
+    <button class="ascension-card" data-action="choose-ascension" data-ascension="${choice.id}">
+      <span class="route">${choice.route}</span>
+      <strong>${choice.name}</strong>
+      <p>${choice.text}</p>
+      <em>确认路线</em>
+    </button>
   `;
 }
 
@@ -381,7 +497,7 @@ function renderComplete() {
     <section class="panel end-state">
       <p class="seal">夜巡完成</p>
       <h1>第一段试炼通过</h1>
-      <p class="muted">三场战斗、三位敌人，全部清理。下一段还在写。</p>
+      <p class="muted">六场夜巡已经清理完毕。公司、学院、夜市都知道了清洁工也能入道。</p>
       <div class="row gap">
         <button class="primary" data-action="goto-select">再来一轮</button>
         <button class="ghost" data-action="goto-splash">返回主界面</button>
@@ -430,6 +546,31 @@ function renderCodex() {
       </section>
 
       <section class="codex-section">
+        <h2>${CHAPTER.name}</h2>
+        <div class="chapter-doc">
+          <article>
+            <strong>章节核心</strong>
+            <p>${CHAPTER.tagline}</p>
+          </article>
+          <article>
+            <strong>组织冲突</strong>
+            <p>主角挂靠哪个组织，就会在第一章主要遇到另外两个组织的外勤、打手和监察单位。</p>
+          </article>
+          <article>
+            <strong>清洁工成长</strong>
+            <p>第 2 战和第 4 战后触发转职节点，路线会改变抽牌、灵污、物理伤害或开场护体。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="codex-section">
+        <h2>清洁工转职路线</h2>
+        <div class="route-doc-grid">
+          ${Object.values(ASCENSIONS).map(renderRouteDoc).join("")}
+        </div>
+      </section>
+
+      <section class="codex-section">
         <h2>卡牌库</h2>
         <div class="card-gallery">
           ${Object.keys(CARD_LIBRARY).map((cardId) => cardButton(cardId, "codex")).join("")}
@@ -443,6 +584,16 @@ function renderCodex() {
         </div>
       </section>
     </section>
+  `;
+}
+
+function renderRouteDoc(choice) {
+  return `
+    <article class="route-doc">
+      <span>${choice.route} · ${choice.tier === 1 ? "初阶" : "进阶"}</span>
+      <strong>${choice.name}</strong>
+      <p>${choice.text}</p>
+    </article>
   `;
 }
 
@@ -490,12 +641,14 @@ function cardIcon(card) {
 function intentIcon(intent) {
   if (intent === "attack") return "杀";
   if (intent === "block") return "守";
+  if (intent === "debuff") return "污";
   return "势";
 }
 
 function intentLabel(intent) {
   if (intent === "attack") return "造成";
   if (intent === "block") return "护体 +";
+  if (intent === "debuff") return "灵污 +";
   return "攻势 +";
 }
 
@@ -504,6 +657,8 @@ function bindEvents() {
     element.addEventListener("click", () => {
       const action = element.dataset.action;
       let shouldSave = true;
+      ensureAudio();
+      playUiSound(action, element);
 
       if (action === "pick-character") pickPendingCharacter(game, element.dataset.character);
       if (action === "confirm-character") {
@@ -515,6 +670,7 @@ function bindEvents() {
       if (action === "confirm-selection") confirmSelection(game);
       if (action === "play-card") playCard(game, Number(element.dataset.index));
       if (action === "end-turn") endTurn(game);
+      if (action === "choose-ascension") chooseAscension(game, element.dataset.ascension);
       if (action === "choose-reward") addRewardCard(game, element.dataset.card);
       if (action === "skip-reward") skipReward(game);
       if (action === "open-codex") {
@@ -556,13 +712,17 @@ function bindEvents() {
 
 function saveGame(value) {
   if (!value.player || value.screen === "splash" || value.screen === "select") return;
-  localStorage.setItem(SAVE_KEY, JSON.stringify(value));
+  localStorage.setItem(SAVE_KEY, JSON.stringify({ ...value, fx: null, saveVersion: SAVE_VERSION }));
 }
 
 function loadGame() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const value = JSON.parse(raw);
+    if (value.saveVersion !== SAVE_VERSION) return null;
+    if (!value.player?.bonuses || !value.player?.deck) return null;
+    return value;
   } catch {
     return null;
   }
@@ -570,6 +730,85 @@ function loadGame() {
 
 function clearSave() {
   localStorage.removeItem(SAVE_KEY);
+}
+
+function ensureAudio() {
+  if (!audio) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    audio = {
+      ctx: new AudioContext(),
+      step: 0,
+      scale: [110, 146.8, 164.8, 196, 220, 293.6],
+    };
+  }
+  if (audio.ctx.state === "suspended") audio.ctx.resume();
+  startBgm();
+}
+
+function startBgm() {
+  if (!audio || bgmTimer) return;
+  bgmTimer = setInterval(() => {
+    if (!audio || audio.ctx.state !== "running") return;
+    const note = audio.scale[audio.step % audio.scale.length];
+    audio.step += 1;
+    playTone(note, 0.18, 0.026, "triangle", 0.02);
+    if (audio.step % 4 === 0) playTone(note / 2, 0.32, 0.018, "sine", 0.01);
+  }, 560);
+}
+
+function playUiSound(action, element) {
+  if (!audio) return;
+  if (action === "play-card") {
+    const card = CARD_LIBRARY[element?.dataset.card];
+    const pitch = card?.vfx?.pitch || 392;
+    playTone(pitch, 0.08, 0.08, card?.type === "attack" ? "sawtooth" : "triangle", 0);
+    if (card?.vfx?.kind === "pressure-wash") playTone(pitch * 1.5, 0.18, 0.045, "sine", 0.04);
+    if (card?.vfx?.kind === "recycle-blade") playTone(pitch * 0.75, 0.13, 0.05, "square", 0.05);
+    if (card?.vfx?.kind === "talisman-purge") playTone(pitch * 1.25, 0.24, 0.05, "triangle", 0.08);
+    return;
+  }
+  const map = {
+    "end-turn": [130.8, 0.16, 0.06, "triangle"],
+    "choose-reward": [523.2, 0.12, 0.07, "triangle"],
+    "choose-ascension": [659.2, 0.22, 0.08, "sine"],
+    "confirm-selection": [246.9, 0.18, 0.07, "triangle"],
+    "goto-select": [196, 0.12, 0.06, "triangle"],
+  };
+  const tone = map[action] || [220, 0.05, 0.035, "sine"];
+  playTone(tone[0], tone[1], tone[2], tone[3], 0);
+  if (action === "choose-ascension") playTone(tone[0] * 1.5, tone[1] + 0.08, tone[2] * 0.72, "triangle", 0.05);
+}
+
+function playTone(frequency, duration, gainValue, type = "sine", delay = 0) {
+  if (!audio) return;
+  const { ctx } = audio;
+  const start = ctx.currentTime + delay;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(frequency, start);
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, gainValue), start + 0.018);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start + duration + 0.03);
+}
+
+function scheduleFxClear() {
+  if (fxTimer) {
+    clearTimeout(fxTimer);
+    fxTimer = null;
+  }
+  if (!game.fx) return;
+  const fxId = game.fx.id;
+  fxTimer = setTimeout(() => {
+    if (game.fx?.id !== fxId) return;
+    game.fx = null;
+    render();
+  }, 560);
 }
 
 render();
